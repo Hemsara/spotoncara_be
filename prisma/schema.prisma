@@ -1,0 +1,1830 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model AppSetting {
+  Id         BigInt    @unique @default(autoincrement())
+  App        String?   @db.VarChar(50)
+  SenderId   String?   @db.VarChar(100)
+  APIKey     String?   @db.VarChar(300)
+  CreatedBy  String?   @db.VarChar(100)
+  CreatedDt  DateTime? @db.DateTime
+  ModifiedBy String?   @db.VarChar(100)
+  ModifiedDt DateTime? @db.DateTime
+  IsDeleted  Boolean?
+
+  @@ignore
+}
+
+model Location {
+  LocPk                                   BigInt      @id(map: "PK__Location__6A46651BB8E69869") @default(autoincrement())
+  LocName                                 String?     @db.VarChar(500)
+  LocType                                 String?     @db.VarChar(5)
+  CreatedBy                               String?     @db.VarChar(250)
+  CreatedDt                               DateTime?   @db.DateTime
+  ModifiedBy                              String?     @db.VarChar(250)
+  ModifiedDt                              DateTime?   @db.DateTime
+  IsDeleted                               Boolean?    @default(false, map: "DF__Location__IsDele__6DEC4894")
+  LocIcon                                 String?     @db.VarChar(250)
+  LocOrder                                Int?        @default(0, map: "DF__Location__LocOrd__002AF460")
+  LocAddress                              String?     @db.VarChar(Max)
+  Tags                                    String?     @db.VarChar(Max)
+  Postcode                                String?     @db.VarChar(150)
+  LocGroup                                String?     @db.VarChar(250)
+  LocAddress1                             String?     @db.VarChar(Max)
+  PickupCharge                            Decimal?    @db.Decimal(27, 2)
+  DropoffCharge                           Decimal?    @db.Decimal(27, 2)
+  Quotation_Quotation_FromLocIdToLocation Quotation[] @relation("Quotation_FromLocIdToLocation")
+  Quotation_Quotation_ToLocIdToLocation   Quotation[] @relation("Quotation_ToLocIdToLocation")
+}
+
+model LocationFare {
+  LocFarePk      BigInt    @id(map: "PK__Location__8216168FBA00C482") @default(autoincrement())
+  PickLocFk      BigInt
+  DropLocFk      BigInt
+  Eclass         Decimal?  @db.Decimal(27, 2)
+  Sclass         Decimal?  @db.Decimal(27, 2)
+  Viano          Decimal?  @db.Decimal(27, 2)
+  Eightseater    Decimal?  @db.Decimal(27, 2)
+  EcoSaloon      Decimal?  @db.Decimal(27, 2)
+  EcoMpv         Decimal?  @db.Decimal(27, 2)
+  RetPickLocFk   BigInt
+  RetDropLocFk   BigInt
+  RetEclass      Decimal?  @db.Decimal(27, 2)
+  RetSclass      Decimal?  @db.Decimal(27, 2)
+  RetViano       Decimal?  @db.Decimal(27, 2)
+  RetEightseater Decimal?  @db.Decimal(27, 2)
+  RetEcoSaloon   Decimal?  @db.Decimal(27, 2)
+  RetEcoMpv      Decimal?  @db.Decimal(27, 2)
+  CreatedBy      String?   @db.VarChar(250)
+  CreatedDt      DateTime? @db.DateTime
+  ModifiedBy     String?   @db.VarChar(250)
+  ModifiedDt     DateTime? @db.DateTime
+  IsDeleted      Int?
+  Estate         Decimal?  @default(0, map: "DF__LocationF__Estat__6C23FBB3") @db.Decimal(27, 2)
+  Coach          Decimal?  @default(0, map: "DF__LocationF__Coach__6D181FEC") @db.Decimal(27, 2)
+  RetEstate      Decimal?  @default(0, map: "DF__LocationF__RetEs__6E0C4425") @db.Decimal(27, 2)
+  RetCoach       Decimal?  @default(0, map: "DF__LocationF__RetCo__6F00685E") @db.Decimal(27, 2)
+}
+
+model ManualInvoice {
+  InvPk         BigInt    @id(map: "PK__ManualIn__9DC87BB81A0434AA") @default(autoincrement())
+  AccFk         BigInt?
+  UserFk        BigInt?
+  InvNo         String    @db.VarChar(250)
+  InvDate       DateTime  @db.DateTime
+  InvDueDate    DateTime? @db.DateTime
+  InvType       String?   @db.VarChar(150)
+  InvTypePk     BigInt?
+  InvPayMethod  String?   @db.VarChar(10)
+  InvAttach     String?   @db.VarChar(Max)
+  InvAmount     Decimal?  @default(0, map: "DF__ManualInv__InvAm__739B0049") @db.Decimal(27, 7)
+  InvPaidAmt    Decimal?  @default(0, map: "DF__ManualInv__InvPa__748F2482") @db.Decimal(27, 7)
+  InvBalance    Decimal?  @default(0, map: "DF__ManualInv__InvBa__758348BB") @db.Decimal(27, 7)
+  PaymentDate   DateTime? @db.DateTime
+  PaymentStatus String?   @db.VarChar(50)
+  Comments      String?   @db.VarChar(Max)
+  InvMonthYear  String?   @db.VarChar(50)
+  IsPublished   Int?      @default(0, map: "DF__ManualInv__IsPub__76776CF4")
+  CreatedBy     String?   @db.VarChar(250)
+  CreatedDt     DateTime? @db.DateTime
+  ModifiedBy    String?   @db.VarChar(250)
+  ModifiedDt    DateTime? @db.DateTime
+  IsDeleted     Boolean?  @default(false, map: "DF__ManualInv__IsDel__776B912D")
+  MailTo        String?   @db.VarChar(Max)
+  ReportType    String?   @db.VarChar(150)
+}
+
+model ManualInvPayment {
+  InvDetPk      BigInt   @id(map: "PK__ManualIn__38E4770A179DFD78") @default(autoincrement())
+  InvFk         BigInt
+  PaymentDate   DateTime @db.DateTime
+  PaidAmount    Decimal  @db.Decimal(27, 7)
+  PaymentMethod String?  @db.VarChar(150)
+  Remarks       String?  @db.VarChar(Max)
+  IsDeleted     Boolean? @default(false, map: "DF__ManualInv__IsDel__121F8769")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model NotificationDetails {
+  Id         BigInt    @default(autoincrement())
+  CustPk     BigInt
+  DeviceId   String    @db.VarChar(Max)
+  DeviceType String    @db.VarChar(50)
+  Message    String?   @db.VarChar(Max)
+  SentDate   DateTime? @db.DateTime
+  CreatedBy  String?   @db.VarChar(50)
+  CreatedDt  DateTime? @db.DateTime
+  ModifiedBy String?   @db.VarChar(50)
+  ModifiedDt DateTime? @db.DateTime
+  IsDeleted  Boolean?
+  Status     String?   @db.VarChar(30)
+  App        String?   @db.VarChar(100)
+  Type       String?   @db.VarChar(50)
+  ErrMsg     String?   @db.VarChar(Max)
+
+  @@ignore
+}
+
+model Package_Det {
+  Id                   BigInt      @id(map: "PK__Package___3214EC077BCB0AB9") @default(autoincrement())
+  HdrId                BigInt
+  ReceiverName         String?     @db.VarChar(650)
+  DestinationAddr      String?     @db.VarChar(650)
+  PackageWeight        Decimal?    @db.Decimal(27, 7)
+  PackageCount         Int?
+  DeliveryDate         DateTime?   @db.DateTime
+  DeliveryStatus       String?     @db.VarChar(50)
+  DeliverySlipFilePath String?     @db.VarChar(1000)
+  DeliveryPerson       String?     @db.VarChar(250)
+  DeliveryRemarks      String?     @db.VarChar(650)
+  DeliveryFare         Decimal?    @db.Decimal(27, 7)
+  Insurance            Decimal?    @db.Decimal(27, 7)
+  Discount             Decimal?    @db.Decimal(27, 7)
+  Tax                  Decimal?    @db.Decimal(27, 7)
+  IsDelivered          Boolean?
+  CreatedBy            String?     @db.VarChar(250)
+  CreatedDt            DateTime?   @db.DateTime
+  ModifiedBy           String?     @db.VarChar(250)
+  ModifiedDt           DateTime?   @db.DateTime
+  IsDeleted            Boolean?
+  Package_Hdr          Package_Hdr @relation(fields: [HdrId], references: [Id], onUpdate: NoAction, map: "FK__Package_D__HdrId__78E9C54B")
+}
+
+model Package_Det_old {
+  Id                   BigInt          @id(map: "PK__Package___3214EC0773561EB9") @default(autoincrement())
+  HdrId                BigInt
+  ReceiverName         String?         @db.VarChar(650)
+  DestinationAddr      String?         @db.VarChar(650)
+  Weight               Decimal?        @db.Decimal(27, 7)
+  Count                Int?
+  DeliveryDate         DateTime?       @db.DateTime
+  DeliveryStatus       String?         @db.VarChar(50)
+  DeliverySlipFilePath String?         @db.VarChar(650)
+  DeliveryPerson       String?         @db.VarChar(250)
+  DeliveryRemarks      String?         @db.VarChar(650)
+  DeliveryFare         Decimal?        @db.Decimal(27, 7)
+  Insurance            Decimal?        @db.Decimal(27, 7)
+  Discount             Decimal?        @db.Decimal(27, 7)
+  IsDelivered          Boolean?
+  CreatedBy            String?         @db.VarChar(250)
+  CreatedDt            DateTime?       @db.DateTime
+  ModifiedBy           String?         @db.VarChar(250)
+  ModifiedDt           DateTime?       @db.DateTime
+  IsDeleted            Boolean?
+  Package_Hdr_old      Package_Hdr_old @relation(fields: [HdrId], references: [Id], onUpdate: NoAction, map: "FK__Package_D__HdrId__68B35D82")
+}
+
+model Package_Hdr {
+  Id          BigInt        @id(map: "PK__Package___3214EC07F0CE0C03") @default(autoincrement())
+  RefNo       String?       @db.NVarChar(4000)
+  AgentId     BigInt?
+  CustId      BigInt?
+  CarId       BigInt?
+  FromName    String?       @db.VarChar(250)
+  FromAddress String?       @db.VarChar(650)
+  Date        DateTime?     @db.DateTime
+  Status      String?       @db.VarChar(50)
+  FilePath    String?       @db.VarChar(1000)
+  Fare        Decimal?      @db.Decimal(27, 7)
+  Tax         Decimal?      @db.Decimal(27, 7)
+  Insurance   Decimal?      @db.Decimal(27, 7)
+  Discount    Decimal?      @db.Decimal(27, 7)
+  IsDelivered Boolean?
+  Remarks     String?       @db.VarChar(650)
+  CreatedBy   String?       @db.VarChar(250)
+  CretedDt    DateTime?     @db.DateTime
+  ModifiedBy  String?       @db.VarChar(250)
+  ModifiedDt  DateTime?     @db.DateTime
+  IsDeleted   Boolean?
+  Package_Det Package_Det[]
+}
+
+model Package_Hdr_old {
+  Id              BigInt            @id(map: "PK__Package___3214EC076552C4AF") @default(autoincrement())
+  RefNo           String?           @db.NVarChar(4000)
+  AgentId         BigInt?
+  CustId          BigInt?
+  CarId           BigInt?
+  FromName        String?           @db.VarChar(250)
+  FromAddress     String?           @db.VarChar(650)
+  Date            DateTime?         @db.DateTime
+  Status          String?           @db.VarChar(50)
+  FilePath        String?           @db.VarChar(650)
+  Fare            Decimal?          @db.Decimal(27, 7)
+  Tax             Decimal?          @db.Decimal(27, 7)
+  Discount        Decimal?          @db.Decimal(27, 7)
+  IsDelivered     Boolean?
+  Remarks         String?           @db.VarChar(650)
+  CreatedBy       String?           @db.VarChar(250)
+  CretedDt        DateTime?         @db.DateTime
+  ModifiedBy      String?           @db.VarChar(250)
+  ModifiedDt      DateTime?         @db.DateTime
+  IsDeleted       Boolean?
+  Package_Det_old Package_Det_old[]
+}
+
+model Quotation {
+  Id                                     BigInt    @id(map: "PK__Quotatio__3214EC0786B7B1CB") @default(autoincrement())
+  QuoteNo                                String?   @db.NVarChar(4000)
+  QuoteType                              String?   @db.VarChar(50)
+  AgentId                                BigInt?
+  CustId                                 BigInt?
+  FromLocId                              BigInt?
+  ToLocId                                BigInt?
+  PickupLoc                              String?   @db.VarChar(650)
+  DropLoc                                String?   @db.VarChar(650)
+  CarId                                  BigInt?
+  Fare                                   Decimal?  @db.Decimal(27, 7)
+  Tax                                    Decimal?  @db.Decimal(27, 7)
+  Discount                               Decimal?  @db.Decimal(27, 7)
+  QuoteFrom                              String?   @db.VarChar(650)
+  QuoteTo                                String?   @db.VarChar(650)
+  QuoteDate                              DateTime? @db.DateTime
+  QuoteStatus                            String?   @db.VarChar(50)
+  QuoteFilePath                          String?   @db.VarChar(650)
+  CreatedBy                              String?   @db.VarChar(250)
+  CretedDt                               DateTime? @db.DateTime
+  ModifiedBy                             String?   @db.VarChar(250)
+  ModifiedDt                             DateTime? @db.DateTime
+  IsDeleted                              Boolean?
+  Location_Quotation_FromLocIdToLocation Location? @relation("Quotation_FromLocIdToLocation", fields: [FromLocId], references: [LocPk], onDelete: NoAction, onUpdate: NoAction, map: "FK__Quotation__FromL__50DBD3F1")
+  Location_Quotation_ToLocIdToLocation   Location? @relation("Quotation_ToLocIdToLocation", fields: [ToLocId], references: [LocPk], onDelete: NoAction, onUpdate: NoAction, map: "FK__Quotation__ToLoc__51CFF82A")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model SearchLocation {
+  Id         Int       @default(autoincrement())
+  LocPK      BigInt
+  LocCode    String?   @db.VarChar(200)
+  LocName    String    @db.VarChar(200)
+  LocType    String?   @db.VarChar(5)
+  CreatedBy  String?   @db.VarChar(50)
+  CreatedDt  DateTime? @db.DateTime
+  ModifiedBy String?   @db.VarChar(50)
+  ModifiedDt DateTime? @db.DateTime
+  IsDeleted  Boolean?
+
+  @@ignore
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B615B78929E") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_Accounts {
+  AccPk           BigInt    @default(autoincrement())
+  BookFk          BigInt
+  IsReturn        Int?
+  BookAgent       String?   @db.VarChar(100)
+  Passenger       String?   @db.VarChar(150)
+  Direction       String?   @db.VarChar(Max)
+  PickupDate      DateTime? @db.DateTime
+  RefNo           String?   @db.VarChar(50)
+  RefId           String?   @db.VarChar(50)
+  CarName         String?   @db.VarChar(150)
+  DriverName      String?   @db.VarChar(150)
+  AccType         String?   @db.VarChar(100)
+  AccName         String?   @db.VarChar(150)
+  Notes           String?   @db.VarChar(250)
+  TotalFare       Decimal?  @db.Decimal(27, 7)
+  Commission      Decimal?  @db.Decimal(27, 2)
+  DriverHolds     Decimal?  @db.Decimal(27, 7)
+  CompanyHolds    Decimal?  @db.Decimal(27, 7)
+  CashPay         Decimal?  @db.Decimal(27, 7)
+  AccPay          Decimal?  @db.Decimal(27, 7)
+  CardPay         Decimal?  @db.Decimal(27, 7)
+  Balance         Decimal?  @db.Decimal(27, 7)
+  AccStatus       Int?
+  AccCreatedBy    String?   @db.VarChar(100)
+  AccCreatedDt    DateTime? @db.DateTime
+  AccModifiedBy   String?   @db.VarChar(100)
+  AccModifiedDt   DateTime? @db.DateTime
+  AccDelId        Int?      @default(0, map: "DF__Tbl_Accou__AccDe__5D76B500")
+  AgentComm       Decimal?  @db.Decimal(27, 7)
+  DriverFk        BigInt?
+  DirectPay       Decimal?  @db.Decimal(27, 7)
+  AccModifyReason String?   @db.VarChar(250)
+  IsAudit         Int?      @default(0, map: "DF__Tbl_Accou__IsAud__5E6AD939")
+  AgentCashComm   Decimal?  @db.Decimal(27, 7)
+  Expense         Decimal?  @default(0, map: "DF__Tbl_Accou__Expen__5F5EFD72") @db.Decimal(27, 7)
+  AgentFk         BigInt?
+  CustFk          BigInt?
+  DriverComm      Decimal?  @db.Decimal(27, 7)
+  CarFk           BigInt?
+  IsPaid          Boolean?  @default(false, map: "DF__Tbl_Accou__IsPai__605321AB")
+  UserFk          BigInt?
+  CashExpense     Decimal?  @db.Decimal(27, 7)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_Accounts_2019 {
+  AccPk           BigInt    @default(autoincrement())
+  BookFk          BigInt
+  IsReturn        Int?
+  BookAgent       String?   @db.VarChar(100)
+  Passenger       String?   @db.VarChar(150)
+  Direction       String?   @db.VarChar(Max)
+  PickupDate      DateTime? @db.DateTime
+  RefNo           String?   @db.VarChar(50)
+  RefId           String?   @db.VarChar(50)
+  CarName         String?   @db.VarChar(150)
+  DriverName      String?   @db.VarChar(150)
+  AccType         String?   @db.VarChar(100)
+  AccName         String?   @db.VarChar(150)
+  Notes           String?   @db.VarChar(250)
+  TotalFare       Decimal?  @db.Decimal(27, 7)
+  Commission      Decimal?  @db.Decimal(27, 2)
+  DriverHolds     Decimal?  @db.Decimal(27, 7)
+  CompanyHolds    Decimal?  @db.Decimal(27, 7)
+  CashPay         Decimal?  @db.Decimal(27, 7)
+  AccPay          Decimal?  @db.Decimal(27, 7)
+  CardPay         Decimal?  @db.Decimal(27, 7)
+  Balance         Decimal?  @db.Decimal(27, 7)
+  AccStatus       Int?
+  AccCreatedBy    String?   @db.VarChar(100)
+  AccCreatedDt    DateTime? @db.DateTime
+  AccModifiedBy   String?   @db.VarChar(100)
+  AccModifiedDt   DateTime? @db.DateTime
+  AccDelId        Int?      @default(0, map: "DF__Tbl_Accou__AccDe__540C7B00")
+  AgentComm       Decimal?  @db.Decimal(27, 7)
+  DriverFk        BigInt?
+  DirectPay       Decimal?  @db.Decimal(27, 7)
+  AccModifyReason String?   @db.VarChar(250)
+  IsAudit         Int?      @default(0, map: "DF__Tbl_Accou__IsAud__70A8B9AE")
+  AgentCashComm   Decimal?  @db.Decimal(27, 7)
+  Expense         Decimal?  @default(0, map: "DF__Tbl_Accou__Expen__453F38BC") @db.Decimal(27, 7)
+  AgentFk         BigInt?
+  CustFk          BigInt?
+  DriverComm      Decimal?  @db.Decimal(27, 7)
+  CarFk           BigInt?
+  IsPaid          Boolean?  @default(false, map: "DF__Tbl_Accou__IsPai__38E44ECF")
+  UserFk          BigInt?
+  CashExpense     Decimal?  @db.Decimal(27, 7)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_AccountsLogin {
+  AccUserPk    BigInt    @default(autoincrement())
+  AccUserName  String?   @db.VarChar(500)
+  AccUserPwd   String?   @db.VarChar(500)
+  AccPrevilege String?   @default("1101", map: "DF__Tbl_Accou__AccPr__5EBF139D") @db.Char(4)
+  AccUserType  String?   @db.VarChar(500)
+  AccCreatedBy String?   @db.VarChar(100)
+  AccCreatedDt DateTime? @db.DateTime
+  AccModifyBy  String?   @db.VarChar(100)
+  AccModifyDt  DateTime? @db.DateTime
+  AccDelId     Int?      @default(0, map: "DF__Tbl_Accou__AccDe__5FB337D6")
+  IsAudit      Int?      @default(0, map: "DF__Tbl_Accou__IsAud__6CD828CA")
+  DeviceType   String?   @db.VarChar(100)
+  DeviceId     String?   @db.VarChar(Max)
+  App          String?   @db.VarChar(50)
+  AgentFk      BigInt?
+  APIToken     String?   @db.VarChar(Max)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_AdminLogin {
+  AdminPk        BigInt    @default(autoincrement())
+  AdminName      String?   @db.VarChar(100)
+  AdminPass      String?   @db.VarChar(50)
+  AdminPrevilege String?   @default("1101", map: "DF__Tbl_Admin__Admin__7F60ED59") @db.Char(4)
+  AdminCreatedBy String?   @db.VarChar(150)
+  AdminCreatedDt DateTime? @db.DateTime
+  AdminModifyBy  String?   @db.VarChar(100)
+  AdminModifyDt  DateTime? @db.DateTime
+  AdminDelId     Int?      @default(0, map: "DF__Tbl_Admin__Admin__00551192")
+  IsAudit        Int?      @default(0, map: "DF__Tbl_Admin__IsAud__6BE40491")
+  UserType       String?   @db.VarChar(100)
+  IsAdmin        Int?      @default(0, map: "DF__Tbl_Admin__IsAdm__4EB3945D")
+  IsRead         Int?      @default(0, map: "DF__Tbl_Admin__IsRea__4FA7B896")
+  IsWrite        Int?      @default(0, map: "DF__Tbl_Admin__IsWri__509BDCCF")
+  IsDelete       Int?      @default(0, map: "DF__Tbl_Admin__IsDel__51900108")
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_AmdAccounts {
+  AccPk           BigInt
+  BookFk          BigInt
+  IsReturn        Int?
+  BookAgent       String?   @db.VarChar(100)
+  Passenger       String?   @db.VarChar(150)
+  Direction       String?   @db.VarChar(Max)
+  PickupDate      DateTime? @db.DateTime
+  RefNo           String?   @db.VarChar(50)
+  RefId           String?   @db.VarChar(50)
+  CarName         String?   @db.VarChar(150)
+  DriverName      String?   @db.VarChar(150)
+  AccType         String?   @db.VarChar(100)
+  AccName         String?   @db.VarChar(150)
+  Notes           String?   @db.VarChar(250)
+  TotalFare       Decimal?  @db.Decimal(27, 7)
+  Commission      Decimal?  @db.Decimal(27, 2)
+  DriverHolds     Decimal?  @db.Decimal(27, 7)
+  CompanyHolds    Decimal?  @db.Decimal(27, 7)
+  CashPay         Decimal?  @db.Decimal(27, 7)
+  AccPay          Decimal?  @db.Decimal(27, 7)
+  CardPay         Decimal?  @db.Decimal(27, 7)
+  Balance         Decimal?  @db.Decimal(27, 7)
+  AccStatus       Int?
+  AccCreatedBy    String?   @db.VarChar(100)
+  AccCreatedDt    DateTime? @db.DateTime
+  AccModifiedBy   String?   @db.VarChar(100)
+  AccModifiedDt   DateTime? @db.DateTime
+  AccDelId        Int?      @default(0, map: "DF__Tbl_AmdAc__AccDe__43B6E2FD")
+  AgentComm       Decimal?  @db.Decimal(27, 7)
+  DriverFk        BigInt?
+  DirectPay       Decimal?  @db.Decimal(27, 7)
+  AccModifyReason String?   @db.VarChar(250)
+  IsAudit         Int?      @default(0, map: "DF__Tbl_AmdAc__IsAud__44AB0736")
+  AgentCashComm   Decimal?  @db.Decimal(27, 7)
+  Expense         Decimal?  @default(0, map: "DF__Tbl_AmdAc__Expen__459F2B6F") @db.Decimal(27, 7)
+  AgentFk         BigInt?
+  CustFk          BigInt?
+  DriverComm      Decimal?  @db.Decimal(27, 7)
+  CarFk           BigInt?
+  IsPaid          Boolean?  @default(false, map: "DF__Tbl_AmdAc__IsPai__46934FA8")
+  UserFk          BigInt?
+  CashExpense     Decimal?  @db.Decimal(27, 7)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_AmdAccounts_2019 {
+  AmdAccPk         BigInt?
+  AmdBookFk        BigInt
+  AmdIsReturn      Int?
+  AmdBookAgent     String?   @db.VarChar(100)
+  AmdPassenger     String?   @db.VarChar(150)
+  AmdDirection     String?   @db.VarChar(Max)
+  AmdPickupDate    DateTime? @db.DateTime
+  AmdRefNo         String?   @db.VarChar(50)
+  AmdRefId         String?   @db.VarChar(50)
+  AmdCarName       String?   @db.VarChar(150)
+  AmdDriverName    String?   @db.VarChar(150)
+  AmdAccType       String?   @db.VarChar(100)
+  AmdAccName       String?   @db.VarChar(150)
+  AmdNotes         String?   @db.VarChar(250)
+  AmdTotalFare     Decimal?  @db.Decimal(27, 7)
+  AmdCommission    Decimal?  @db.Decimal(27, 2)
+  AmdDriverHolds   Decimal?  @db.Decimal(27, 7)
+  AmdCompanyHolds  Decimal?  @db.Decimal(27, 7)
+  AmdCashPay       Decimal?  @db.Decimal(27, 7)
+  AmdAccPay        Decimal?  @db.Decimal(27, 7)
+  AmdCardPay       Decimal?  @db.Decimal(27, 7)
+  AmdBalance       Decimal?  @db.Decimal(27, 7)
+  AmdAccStatus     Int?
+  AmdAccCreatedBy  String?   @db.VarChar(100)
+  AmdAccCreatedDt  DateTime? @db.DateTime
+  AmdAccModifiedBy String?   @db.VarChar(100)
+  AmdAccModifiedDt DateTime? @db.DateTime
+  AmdAccDelId      Int?      @default(0, map: "DF__Tbl_AmdAc__AmdAc__2057CCD0")
+  AmdAgentComm     Decimal?  @db.Decimal(27, 2)
+  AmdDriverFk      BigInt?
+  AmdDirectPay     Decimal?  @db.Decimal(27, 7)
+  IsAudit          Int?      @default(0, map: "DF__Tbl_AmdAc__IsAud__719CDDE7")
+  AmdAgentCashComm Decimal?  @db.Decimal(27, 7)
+  AmdExpense       Decimal?  @default(0, map: "DF__Tbl_AmdAc__AmdEx__444B1483") @db.Decimal(27, 7)
+  AmdAgentFk       BigInt?
+  AmdCustFk        BigInt?
+  Reason           String?   @db.VarChar(Max)
+  DriverComm       Decimal?  @db.Decimal(27, 7)
+  CarFk            BigInt?
+  UserFk           BigInt?
+  CashExpense      Decimal?  @db.Decimal(27, 7)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_AmdBookingDetails {
+  BookPk               BigInt
+  BookRefNo            String?   @db.VarChar(50)
+  BookRefId            String?   @db.VarChar(100)
+  BookTyp              String?   @db.VarChar(20)
+  BookCustFk           BigInt?
+  BookDirFk            BigInt?
+  DriverPk             BigInt?
+  BookFrmFk            BigInt?
+  BookToFk             BigInt?
+  BookCarFk            BigInt?
+  BookChildSeat        Int?
+  BookPassengerNm      String?   @db.VarChar(Max)
+  BookPickUpAddr       String?   @db.VarChar(Max)
+  BookPickupTerminal   String?   @db.VarChar(Max)
+  BookDropAddr         String?   @db.VarChar(Max)
+  BookDropTerminal     String?   @db.VarChar(Max)
+  BookFlightNo         String?   @db.VarChar(500)
+  BookPickUpDt         String?   @db.VarChar(10)
+  BookPickUpTime       String?   @db.VarChar(10)
+  BookEstTime          String?   @db.VarChar(10)
+  BookPickupDtTime     DateTime? @db.DateTime
+  BookEstDtTime        DateTime? @db.DateTime
+  BookPayMethod        String?   @db.VarChar(100)
+  BookOnewayFare       Decimal?  @db.Decimal(27, 7)
+  BookPickupFare       Decimal?  @db.Decimal(27, 7)
+  BookCardFare         Decimal?  @db.Decimal(27, 7)
+  BookTotal            Decimal?  @db.Decimal(27, 7)
+  CashPay              Decimal?  @db.Decimal(27, 7)
+  AccPay               Decimal?  @db.Decimal(27, 7)
+  CardPay              Decimal?  @db.Decimal(27, 7)
+  BookComment          String?   @db.NVarChar(Max)
+  BookConfirm          Int?
+  IsReverse            String?   @db.Char(5)
+  IsPaid               Int?
+  IsReturn             Int?
+  BookAgent            String?   @db.VarChar(50)
+  BookCreatedBy        String?   @db.VarChar(100)
+  BookCreatedDt        DateTime? @db.DateTime
+  BookModifiedBy       String?   @db.VarChar(100)
+  BookModifiedDt       DateTime? @db.DateTime
+  BookDelId            Int?
+  Commission           Decimal?  @db.Decimal(27, 7)
+  BookIsUserMail       Int?
+  BookIsDriverMail     Int?
+  AgentComm            Decimal?  @db.Decimal(27, 7)
+  DirectPay            Decimal?  @db.Decimal(27, 7)
+  IsAccounted          Int?
+  BookTourHrs          BigInt?
+  Email                String?   @db.VarChar(500)
+  Title                String?   @db.VarChar(100)
+  IsAudit              Int?
+  AgentCashComm        Decimal?  @db.Decimal(27, 7)
+  Comments             String?   @db.VarChar(Max)
+  BookDeviceId         String?   @db.VarChar(Max)
+  BookDeviceType       String?   @db.VarChar(50)
+  JobStatus            Int?
+  IsPublish            Boolean?
+  DvrComment           String?   @db.VarChar(Max)
+  DvrFile              String?   @db.VarChar(Max)
+  CustFeedback         String?   @db.VarChar(Max)
+  CustRating           String?   @db.VarChar(50)
+  Expense              Decimal?  @db.Decimal(27, 7)
+  Offer                Int?
+  VehicleId            BigInt?
+  ParentId             BigInt?
+  BookSource           String?   @db.VarChar(250)
+  AgentFk              BigInt?
+  PickupType           String?   @db.VarChar(5)
+  DropType             String?   @db.VarChar(5)
+  DvrComission         Decimal?  @db.Decimal(27, 7)
+  ContactNo            String?   @db.VarChar(250)
+  UserFk               BigInt?
+  CashExpense          Decimal?  @db.Decimal(27, 7)
+  DriverName           String?   @db.VarChar(250)
+  DriverContact        String?   @db.VarChar(250)
+  VehicleRegNo         String?   @db.VarChar(250)
+  VehicleModal         String?   @db.VarChar(250)
+  LoginType            String?   @db.VarChar(5)
+  CountryCode          String?   @db.VarChar(5)
+  DialCode             String?   @db.VarChar(10)
+  Sno                  BigInt?
+  BookDropFare         Decimal?  @db.Decimal(27, 7)
+  IsCustomerComplaint  Boolean?
+  NaturofComplaint     String?   @db.NVarChar(2000)
+  InvestigationDetails String?   @db.NVarChar(2000)
+  IsLostProperty       Boolean?
+  LostPropertyDet      String?   @db.NVarChar(2000)
+  FoundPropertyDet     String?   @db.NVarChar(2000)
+  IsAdditionalAddress  Int       @default(0, map: "DF_Tbl_AmdBookingDetails_IsAdditionalAddress")
+  BookingContact       String?   @db.VarChar(50)
+  CommentsForDriver    String?   @default("", map: "DF_Tbl_AmdBookingDetails_CommentsForDriver") @db.VarChar(500)
+  OfficialComment      String?   @default("", map: "DF_Tbl_AmdBookingDetails_OfficialComment") @db.VarChar(500)
+  PickAddressGoogle    String?   @db.VarChar(1000)
+  DropAddressGoogle    String?   @db.VarChar(1000)
+  OtherCharges         Decimal?  @default(0, map: "DF_Tbl_AmdBookingDetails_OtherCharges") @db.Decimal(27, 7)
+  PaymentLinkGenarated Boolean?  @default(false, map: "DF_Tbl_AmdBookingDetails_PaymentLinkGenarated")
+  PaymentLink          String?   @db.VarChar(200)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_AmdBookingDetails_2019 {
+  AmdBookPk             BigInt?
+  AmdBookRefNo          String?   @db.VarChar(50)
+  AmdBookRefId          String?   @db.VarChar(100)
+  AmdBookTyp            String?   @db.VarChar(20)
+  AmdBookCustFk         BigInt?
+  AmdBookDirFk          BigInt?
+  AmdDriverPk           BigInt?
+  AmdBookFrmFk          BigInt?
+  AmdBookToFk           BigInt?
+  AmdBookCarFk          BigInt?
+  AmdBookChildSeat      Int?
+  AmdBookPassengerNm    String?   @db.VarChar(150)
+  AmdBookPickUpAddr     String?   @db.VarChar(Max)
+  AmdBookPickupTerminal String?   @db.VarChar(Max)
+  AmdBookDropAddr       String?   @db.VarChar(Max)
+  AmdBookDropTerminal   String?   @db.VarChar(Max)
+  AmdBookFlightNo       String?   @db.VarChar(150)
+  AmdBookPickUpDt       String?   @db.VarChar(10)
+  AmdBookPickUpTime     String?   @db.VarChar(10)
+  AmdBookEstTime        String?   @db.VarChar(10)
+  AmdBookPickupDtTime   DateTime? @db.DateTime
+  AmdBookEstDtTime      DateTime? @db.DateTime
+  AmdBookPayMethod      String?   @db.VarChar(100)
+  AmdBookOnewayFare     Decimal?  @default(0, map: "DF__Tbl_AmdBo__AmdBo__43D61337") @db.Decimal(27, 7)
+  AmdBookPickupFare     Decimal?  @default(0, map: "DF__Tbl_AmdBo__AmdBo__44CA3770") @db.Decimal(27, 7)
+  AmdBookCardFare       Decimal?  @default(0, map: "DF__Tbl_AmdBo__AmdBo__45BE5BA9") @db.Decimal(27, 7)
+  AmdBookTotal          Decimal?  @db.Decimal(27, 7)
+  AmdCashPay            Decimal?  @db.Decimal(27, 7)
+  AmdAccPay             Decimal?  @db.Decimal(27, 7)
+  AmdCardPay            Decimal?  @db.Decimal(27, 7)
+  AmdCommission         Decimal?  @db.Decimal(27, 7)
+  AmdBookComment        String?   @db.VarChar(Max)
+  AmdBookConfirm        Int?      @default(0, map: "DF__Tbl_AmdBo__AmdBo__46B27FE2")
+  AmdIsReverse          String?   @db.Char(5)
+  AmdIsPaid             Int?      @default(0, map: "DF__Tbl_AmdBo__AmdIs__489AC854")
+  AmdIsReturn           Int?      @default(0, map: "DF__Tbl_AmdBo__AmdIs__498EEC8D")
+  AmdBookCreatedBy      String?   @db.VarChar(100)
+  AmdBookCreatedDt      DateTime? @default(now(), map: "DF__Tbl_AmdBo__AmdBo__4A8310C6") @db.DateTime
+  AmdBookModifiedBy     String?   @db.VarChar(100)
+  AmdBookModifiedDt     DateTime? @default(now(), map: "DF__Tbl_AmdBo__AmdBo__4B7734FF") @db.DateTime
+  AmdBookDelId          Int?      @default(0, map: "DF__Tbl_AmdBo__AmdBo__4C6B5938")
+  AmdAgentComm          Decimal?  @db.Decimal(27, 7)
+  AmdDirectPay          Decimal?  @db.Decimal(27, 7)
+  AmdTourHrs            Int?
+  AmdEmail              String?   @db.VarChar(250)
+  AmdIsAudit            Int?      @default(0, map: "DF__Tbl_AmdBo__AmdIs__73852659")
+  AmdAgentCashComm      Decimal?  @db.Decimal(27, 7)
+  AmdBookAgent          String?   @db.VarChar(50)
+  AmdBookIsUserMail     Int?
+  AmdBookIsDriverMail   Int?
+  AmdIsAccounted        Int?
+  AmdTitle              String?   @db.VarChar(100)
+  AmdComments           String?   @db.VarChar(Max)
+  AmdBookDeviceId       String?   @db.VarChar(Max)
+  AmdBookDeviceType     String?   @db.VarChar(50)
+  AmdJobStatus          Int?
+  AmdExpense            Decimal?  @default(0, map: "DF__Tbl_AmdBo__AmdEx__4356F04A") @db.Decimal(27, 7)
+  AmdVehicleId          BigInt?
+  AmdAgentFk            BigInt?
+  PickupType            String?   @db.VarChar(5)
+  DropType              String?   @db.VarChar(5)
+  DvrComission          Decimal?  @db.Decimal(27, 7)
+  CashExpense           Decimal?  @db.Decimal(27, 7)
+  DriverName            String?   @db.VarChar(250)
+  DriverContact         String?   @db.VarChar(250)
+  VehicleRegNo          String?   @db.VarChar(250)
+  VehicleModal          String?   @db.VarChar(250)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_AmdInvoices {
+  InvPk         BigInt?
+  InvNo         String?   @db.VarChar(250)
+  InvDate       DateTime? @db.DateTime
+  InvType       String?   @db.VarChar(150)
+  InvAgentDvrPk BigInt?
+  InvPayMethod  String?   @db.VarChar(10)
+  InvAttach     String?   @db.VarChar(Max)
+  InvAmount     Decimal?  @default(0, map: "DF__Tbl_AmdIn__InvAm__29820FAE") @db.Decimal(27, 7)
+  InvDueAmt     Decimal?  @default(0, map: "DF__Tbl_AmdIn__InvDu__2A7633E7") @db.Decimal(27, 7)
+  InvTotal      Decimal?  @default(0, map: "DF__Tbl_AmdIn__InvTo__2B6A5820") @db.Decimal(27, 7)
+  InvPayStatus  String?   @db.VarChar(50)
+  Comments      String?   @db.VarChar(Max)
+  AccFk         BigInt?
+  IsPublished   Int?      @default(0, map: "DF__Tbl_AmdIn__IsPub__2C5E7C59")
+  CreatedBy     String?   @db.VarChar(250)
+  CreatedDt     DateTime? @db.DateTime
+  ModifiedBy    String?   @db.VarChar(250)
+  ModifiedDt    DateTime? @db.DateTime
+  IsDeleted     Boolean?  @default(false, map: "DF__Tbl_AmdIn__IsDel__2D52A092")
+  InvMonthYear  String?   @db.VarChar(50)
+  PaymentDate   DateTime? @db.DateTime
+  CustomAddress String?   @db.VarChar(650)
+  Reason        String?   @db.VarChar(Max)
+  AgentCode     String?   @db.VarChar(250)
+
+  @@ignore
+}
+
+model Tbl_Bank {
+  BankPk         BigInt    @id(map: "PK__Tbl_Bank__AA080C3157D67858") @default(autoincrement())
+  AgentFk        BigInt?
+  BankAccNo      String    @db.VarChar(250)
+  AccName        String?   @db.VarChar(250)
+  BankSortCode   String?   @db.VarChar(250)
+  BankIntlAccNo  String?   @db.VarChar(650)
+  BankBranchCode String?   @db.VarChar(150)
+  BankName       String    @db.VarChar(250)
+  BankAddr1      String?   @db.VarChar(250)
+  BankAddr2      String?   @db.VarChar(250)
+  BankAddr3      String?   @db.VarChar(250)
+  BankCity       String?   @db.VarChar(150)
+  BankState      String?   @db.VarChar(150)
+  BankCountry    String?   @db.VarChar(150)
+  CreatedDt      DateTime? @db.DateTime
+  CreatedBy      String?   @db.VarChar(50)
+  IsDeleted      Boolean?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_BankAddress {
+  AgentCode      String?   @db.VarChar(50)
+  BankName       String?   @db.VarChar(150)
+  BankAccNo      String?   @db.VarChar(150)
+  BankSortCode   String?   @db.VarChar(150)
+  BankIntlAccNo  String?   @db.VarChar(250)
+  BankBranchCode String?   @db.VarChar(50)
+  BankAddr1      String?   @db.VarChar(250)
+  BankAddr2      String?   @db.VarChar(150)
+  BankAddr3      String?   @db.VarChar(150)
+  BankCity       String?   @db.VarChar(150)
+  BankState      String?   @db.VarChar(150)
+  BankCountry    String?   @db.VarChar(150)
+  CreatedDt      DateTime? @db.DateTime
+  CreatedBy      String?   @db.VarChar(50)
+  IsDeleted      Boolean?
+  AgentName      String?   @db.VarChar(150)
+  AgentEmail     String?   @db.VarChar(250)
+  AgentPhoneNo   String?   @db.VarChar(50)
+  CompanyName    String?   @db.VarChar(200)
+  AgentFk        BigInt?
+
+  @@ignore
+}
+
+model Tbl_BookingDetails {
+  BookPk               BigInt    @unique @default(autoincrement())
+  BookRefNo            String?   @db.VarChar(50)
+  BookRefId            String?   @db.VarChar(100)
+  BookTyp              String?   @db.VarChar(20)
+  BookCustFk           BigInt?
+  BookDirFk            BigInt?
+  DriverPk             BigInt?   @default(0, map: "DF__Tbl_Booki__Drive__496FBC53")
+  BookFrmFk            BigInt?
+  BookToFk             BigInt?
+  BookCarFk            BigInt?
+  BookChildSeat        Int?
+  BookPassengerNm      String?   @db.VarChar(Max)
+  BookPickUpAddr       String?   @db.VarChar(Max)
+  BookPickupTerminal   String?   @db.VarChar(Max)
+  BookDropAddr         String?   @db.VarChar(Max)
+  BookDropTerminal     String?   @db.VarChar(Max)
+  BookFlightNo         String?   @db.VarChar(500)
+  BookPickUpDt         String?   @db.VarChar(10)
+  BookPickUpTime       String?   @db.VarChar(10)
+  BookEstTime          String?   @db.VarChar(10)
+  BookPickupDtTime     DateTime? @db.DateTime
+  BookEstDtTime        DateTime? @db.DateTime
+  BookPayMethod        String?   @db.VarChar(100)
+  BookOnewayFare       Decimal?  @default(0, map: "DF__Tbl_Booki__BookO__4A63E08C") @db.Decimal(27, 7)
+  BookPickupFare       Decimal?  @default(0, map: "DF__Tbl_Booki__BookP__4B5804C5") @db.Decimal(27, 7)
+  BookCardFare         Decimal?  @default(0, map: "DF__Tbl_Booki__BookC__4C4C28FE") @db.Decimal(27, 7)
+  BookTotal            Decimal?  @db.Decimal(27, 7)
+  CashPay              Decimal?  @db.Decimal(27, 7)
+  AccPay               Decimal?  @db.Decimal(27, 7)
+  CardPay              Decimal?  @db.Decimal(27, 7)
+  BookComment          String?   @db.NVarChar(Max)
+  BookConfirm          Int?      @default(0, map: "DF__Tbl_Booki__BookC__4D404D37")
+  IsReverse            String?   @db.Char(5)
+  IsPaid               Int?      @default(0, map: "DF__Tbl_Booki__IsPai__4F2895A9")
+  IsReturn             Int?      @default(0, map: "DF__Tbl_Booki__IsRet__501CB9E2")
+  BookAgent            String?   @db.VarChar(50)
+  BookCreatedBy        String?   @db.VarChar(100)
+  BookCreatedDt        DateTime? @default(now(), map: "DF__Tbl_Booki__BookC__5110DE1B") @db.DateTime
+  BookModifiedBy       String?   @db.VarChar(100)
+  BookModifiedDt       DateTime? @default(now(), map: "DF__Tbl_Booki__BookM__52050254") @db.DateTime
+  BookDelId            Int?      @default(0, map: "DF__Tbl_Booki__BookD__52F9268D")
+  Commission           Decimal?  @db.Decimal(27, 7)
+  BookIsUserMail       Int?      @default(0, map: "DF__Tbl_Booki__BookI__53ED4AC6")
+  BookIsDriverMail     Int?      @default(0, map: "DF__Tbl_Booki__BookI__54E16EFF")
+  AgentComm            Decimal?  @db.Decimal(27, 7)
+  DirectPay            Decimal?  @db.Decimal(27, 7)
+  IsAccounted          Int?      @default(0, map: "DF__Tbl_Booki__IsAcc__55D59338")
+  BookTourHrs          BigInt?
+  Email                String?   @db.VarChar(500)
+  Title                String?   @db.VarChar(100)
+  IsAudit              Int?      @default(0, map: "DF__Tbl_Booki__IsAud__56C9B771")
+  AgentCashComm        Decimal?  @db.Decimal(27, 7)
+  Comments             String?   @default("", map: "DF__Tbl_Booki__Comme__57BDDBAA") @db.VarChar(Max)
+  BookDeviceId         String?   @db.VarChar(Max)
+  BookDeviceType       String?   @db.VarChar(50)
+  JobStatus            Int?
+  IsPublish            Boolean?  @default(false, map: "DF__Tbl_Booki__IsPub__58B1FFE3")
+  DvrComment           String?   @default("", map: "DF__Tbl_Booki__DvrCo__59A6241C") @db.VarChar(Max)
+  DvrFile              String?   @default("", map: "DF__Tbl_Booki__DvrFi__5A9A4855") @db.VarChar(Max)
+  CustFeedback         String?   @db.VarChar(Max)
+  CustRating           String?   @db.VarChar(50)
+  Expense              Decimal?  @default(0, map: "DF__Tbl_Booki__Expen__5B8E6C8E") @db.Decimal(27, 7)
+  Offer                Int?
+  VehicleId            BigInt?
+  ParentId             BigInt?
+  BookSource           String?   @db.VarChar(250)
+  AgentFk              BigInt?
+  PickupType           String?   @db.VarChar(5)
+  DropType             String?   @db.VarChar(5)
+  DvrComission         Decimal?  @db.Decimal(27, 7)
+  ContactNo            String?   @db.VarChar(250)
+  UserFk               BigInt?
+  CashExpense          Decimal?  @db.Decimal(27, 7)
+  DriverName           String?   @db.VarChar(250)
+  DriverContact        String?   @db.VarChar(250)
+  VehicleRegNo         String?   @db.VarChar(250)
+  VehicleModal         String?   @db.VarChar(250)
+  LoginType            String?   @db.VarChar(5)
+  CountryCode          String?   @db.VarChar(5)
+  DialCode             String?   @db.VarChar(10)
+  Sno                  BigInt?
+  BookDropFare         Decimal?  @db.Decimal(27, 7)
+  IsCustomerComplaint  Boolean?
+  NaturofComplaint     String?   @db.NVarChar(2000)
+  InvestigationDetails String?   @db.NVarChar(2000)
+  IsLostProperty       Boolean?
+  LostPropertyDet      String?   @db.NVarChar(2000)
+  FoundPropertyDet     String?   @db.NVarChar(2000)
+  IsAdditionalAddress  Int       @default(0, map: "DF_Tbl_BookingDetails_IsAdditionalAddress")
+  BookingContact       String?   @db.VarChar(50)
+  CommentsForDriver    String?   @default("", map: "DF_Tbl_BookingDetails_CommentsForDriver") @db.VarChar(500)
+  OfficialComment      String?   @default("", map: "DF_Tbl_BookingDetails_OfficialComment") @db.VarChar(500)
+  PickAddressGoogle    String?   @db.VarChar(1000)
+  DropAddressGoogle    String?   @db.VarChar(1000)
+  OtherCharges         Decimal   @default(0, map: "DF_Tbl_BookingDetails_OtherCharges") @db.Decimal(27, 7)
+  PaymentLinkGenarated Boolean?  @default(false, map: "DF_Tbl_BookingDetails_PaymentLinkGenarated")
+  PaymentLink          String?   @db.VarChar(200)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_BookingDetails_2019 {
+  BookPk             BigInt    @default(autoincrement())
+  BookRefNo          String?   @db.VarChar(50)
+  BookRefId          String?   @db.VarChar(100)
+  BookTyp            String?   @db.VarChar(20)
+  BookCustFk         BigInt?
+  BookDirFk          BigInt?
+  DriverPk           BigInt?   @default(0, map: "DF__Tbl_Booki__Drive__208CD6FA")
+  BookFrmFk          BigInt?
+  BookToFk           BigInt?
+  BookCarFk          BigInt?
+  BookChildSeat      Int?
+  BookPassengerNm    String?   @db.VarChar(Max)
+  BookPickUpAddr     String?   @db.VarChar(Max)
+  BookPickupTerminal String?   @db.VarChar(Max)
+  BookDropAddr       String?   @db.VarChar(Max)
+  BookDropTerminal   String?   @db.VarChar(Max)
+  BookFlightNo       String?   @db.VarChar(500)
+  BookPickUpDt       String?   @db.VarChar(10)
+  BookPickUpTime     String?   @db.VarChar(10)
+  BookEstTime        String?   @db.VarChar(10)
+  BookPickupDtTime   DateTime? @db.DateTime
+  BookEstDtTime      DateTime? @db.DateTime
+  BookPayMethod      String?   @db.VarChar(100)
+  BookOnewayFare     Decimal?  @default(0, map: "DF__Tbl_Booki__BookO__2180FB33") @db.Decimal(27, 7)
+  BookPickupFare     Decimal?  @default(0, map: "DF__Tbl_Booki__BookP__22751F6C") @db.Decimal(27, 7)
+  BookCardFare       Decimal?  @default(0, map: "DF__Tbl_Booki__BookC__236943A5") @db.Decimal(27, 7)
+  BookTotal          Decimal?  @db.Decimal(27, 7)
+  CashPay            Decimal?  @db.Decimal(27, 7)
+  AccPay             Decimal?  @db.Decimal(27, 7)
+  CardPay            Decimal?  @db.Decimal(27, 7)
+  BookComment        String?   @db.NVarChar(Max)
+  BookConfirm        Int?      @default(0, map: "DF__Tbl_Booki__BookC__245D67DE")
+  IsReverse          String?   @db.Char(5)
+  IsPaid             Int?      @default(0, map: "DF__Tbl_Booki__IsPai__2645B050")
+  IsReturn           Int?      @default(0, map: "DF__Tbl_Booki__IsRet__2739D489")
+  BookAgent          String?   @db.VarChar(50)
+  BookCreatedBy      String?   @db.VarChar(100)
+  BookCreatedDt      DateTime? @default(now(), map: "DF__Tbl_Booki__BookC__282DF8C2") @db.DateTime
+  BookModifiedBy     String?   @db.VarChar(100)
+  BookModifiedDt     DateTime? @default(now(), map: "DF__Tbl_Booki__BookM__29221CFB") @db.DateTime
+  BookDelId          Int?      @default(0, map: "DF__Tbl_Booki__BookD__2A164134")
+  Commission         Decimal?  @db.Decimal(27, 7)
+  BookIsUserMail     Int?      @default(0, map: "DF__Tbl_Booki__BookI__01D345B0")
+  BookIsDriverMail   Int?      @default(0, map: "DF__Tbl_Booki__BookI__02C769E9")
+  AgentComm          Decimal?  @db.Decimal(27, 7)
+  DirectPay          Decimal?  @db.Decimal(27, 7)
+  IsAccounted        Int?      @default(0, map: "DF__Tbl_Booki__IsAcc__4959E263")
+  BookTourHrs        BigInt?
+  Email              String?   @db.VarChar(500)
+  Title              String?   @db.VarChar(100)
+  IsAudit            Int?      @default(0, map: "DF__Tbl_Booki__IsAud__6EC0713C")
+  AgentCashComm      Decimal?  @db.Decimal(27, 7)
+  Comments           String?   @default("", map: "DF__Tbl_Booki__Comme__67DE6983") @db.VarChar(Max)
+  BookDeviceId       String?   @db.VarChar(Max)
+  BookDeviceType     String?   @db.VarChar(50)
+  JobStatus          Int?
+  IsPublish          Boolean?  @default(false, map: "DF__Tbl_Booki__IsPub__4FF1D159")
+  DvrComment         String?   @default("", map: "DF__Tbl_Booki__DvrCo__52CE3E04") @db.VarChar(Max)
+  DvrFile            String?   @default("", map: "DF__Tbl_Booki__DvrFi__55AAAAAF") @db.VarChar(Max)
+  CustFeedback       String?   @db.VarChar(Max)
+  CustRating         String?   @db.VarChar(50)
+  Expense            Decimal?  @default(0, map: "DF__Tbl_Booki__Expen__407A839F") @db.Decimal(27, 7)
+  Offer              Int?
+  VehicleId          BigInt?
+  ParentId           BigInt?
+  BookSource         String?   @db.VarChar(250)
+  AgentFk            BigInt?
+  PickupType         String?   @db.VarChar(5)
+  DropType           String?   @db.VarChar(5)
+  DvrComission       Decimal?  @db.Decimal(27, 7)
+  ContactNo          String?   @db.VarChar(250)
+  UserFk             BigInt?
+  CashExpense        Decimal?  @db.Decimal(27, 7)
+  DriverName         String?   @db.VarChar(250)
+  DriverContact      String?   @db.VarChar(250)
+  VehicleRegNo       String?   @db.VarChar(250)
+  VehicleModal       String?   @db.VarChar(250)
+  LoginType          String?   @db.VarChar(5)
+  CountryCode        String?   @db.VarChar(5)
+  DialCode           String?   @db.VarChar(10)
+  Sno                BigInt?
+
+  @@ignore
+}
+
+model tbl_BookingLocations {
+  Id       Int      @id(map: "PK_tbl_BookingLocations") @default(autoincrement())
+  Ref      String   @db.VarChar(30)
+  Location String   @db.VarChar(300)
+  PostCode String   @db.VarChar(15)
+  LocType  String   @db.VarChar(1)
+  DateTime DateTime @db.DateTime
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_BookingStatus {
+  StatusId   Int
+  StatusName String @db.VarChar(500)
+  IsDeleted  Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_CarDetails {
+  CarPk             BigInt    @default(autoincrement())
+  CarOrder          Int?
+  CarName           String?   @db.VarChar(150)
+  CarDesc           String?   @db.VarChar(250)
+  CarSeating        BigInt?
+  CarChildSeat      BigInt?
+  CarHLuggage       BigInt?
+  CarSLuggage       BigInt?
+  CarCreatedBy      String?   @db.VarChar(50)
+  CarCreatedDt      DateTime? @db.DateTime
+  CarModifiedBy     String?   @db.VarChar(50)
+  CarModifiedDt     DateTime? @db.DateTime
+  CarDelId          Int?      @default(0, map: "DF__Tbl_CarDe__CarDe__25869641")
+  CarDefaultPrice   Decimal?  @db.Decimal(27, 7)
+  CarMinimumPrice   Decimal?  @db.Decimal(27, 7)
+  TourRate          Decimal?  @db.Decimal(27, 7)
+  LongDistTourRate  Decimal?  @db.Decimal(27, 7)
+  LargeImage        String?   @default("", map: "DF__Tbl_CarDe__Large__742F31CF") @db.VarChar(Max)
+  SmallImage        String?   @default("", map: "DF__Tbl_CarDe__Small__75235608") @db.VarChar(Max)
+  PerMile           Decimal?  @default(0, map: "DF__Tbl_CarDe__PerMi__4B8221F7") @db.Decimal(27, 7)
+  CarToDisplay      String?   @db.VarChar(Max)
+  Offer             Int?      @default(0, map: "DF__Tbl_CarDe__Offer__772B9A0B")
+  AirportPickup     Decimal?  @db.Decimal(27, 7)
+  Parking           Decimal?  @db.Decimal(27, 7)
+  IsAvailable       Boolean?
+  AirportDropoff    Decimal?  @db.Decimal(27, 7)
+  MultiLocationFare Decimal?  @default(0, map: "DF__Tbl_CarDe__Multi__46E85563") @db.Decimal(18, 2)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_Configuration {
+  PickUpInsideFare BigInt?
+  ChildSeatFare    BigInt? @default(0, map: "DF__Tbl_Confi__Child__37A5467C")
+  CardFare         BigInt? @default(0, map: "DF__Tbl_Confi__CardF__38996AB5")
+  MaxPickupHour    BigInt? @default(0, map: "DF__Tbl_Confi__MaxPi__398D8EEE")
+  LondonTourRate   BigInt? @default(0, map: "DF__Tbl_Confi__Londo__40C49C62")
+  LongDistTourRate BigInt? @default(0, map: "DF__Tbl_Confi__LongD__41B8C09B")
+  VATNumber        String? @db.VarChar(50)
+  DvrTrackInterval BigInt?
+  MileRange1       Int?    @default(0, map: "DF__Tbl_Confi__MileR__71A7CADF")
+  MileRange2       Int?    @default(0, map: "DF__Tbl_Confi__MileR__729BEF18")
+  WebAPIKey        String? @db.VarChar(250)
+  SMSFromName      String? @db.VarChar(250)
+  SMSAPIKey        String? @db.VarChar(250)
+  WhatsAppKey      String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_Customer {
+  CustPk           BigInt    @default(autoincrement())
+  CustSno          BigInt?
+  CustTitle        String?   @db.VarChar(10)
+  CustFName        String?   @db.VarChar(Max)
+  CustLName        String?   @db.VarChar(Max)
+  CustAddr         String?   @db.VarChar(Max)
+  CustPostCode     String?   @db.VarChar(100)
+  CustPhoneNo      String?   @db.VarChar(20)
+  CustMobileNo     String?   @db.VarChar(20)
+  CustEmail        String?   @db.VarChar(150)
+  CustPwd          String?   @db.VarChar(650)
+  CustCaptcha      String?   @db.VarChar(20)
+  CustCreatedBy    String?   @db.VarChar(150)
+  CustCreatedDt    DateTime? @db.DateTime
+  CustModifyBy     String?   @db.VarChar(100)
+  CustModifyDt     DateTime? @db.DateTime
+  CustDelID        Int?      @default(0, map: "DF__Tbl_Custo__CustD__3EF22DE0")
+  CustAgent        String?   @db.VarChar(250)
+  IsAudit          Int?      @default(0, map: "DF__Tbl_Custo__IsAud__3FE65219")
+  CustFacebookID   BigInt?
+  CustDeviceID     String?   @db.NVarChar(Max)
+  CustDeviceType   String?   @db.VarChar(150)
+  App              String?   @db.VarChar(100)
+  AgentFk          BigInt?
+  CountryCode      String?   @db.VarChar(5)
+  DialCode         String?   @db.VarChar(10)
+  RefId            String?   @db.VarChar(150)
+  BookingContactNo String?   @db.VarChar(30)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_Customer_2019 {
+  CustPk         BigInt    @default(autoincrement())
+  CustSno        BigInt?
+  CustTitle      String?   @db.VarChar(10)
+  CustFName      String?   @db.VarChar(Max)
+  CustLName      String?   @db.VarChar(Max)
+  CustAddr       String?   @db.VarChar(Max)
+  CustPostCode   String?   @db.VarChar(100)
+  CustPhoneNo    String?   @db.VarChar(20)
+  CustMobileNo   String?   @db.VarChar(20)
+  CustEmail      String?   @db.VarChar(150)
+  CustPwd        String?   @db.VarChar(650)
+  CustCaptcha    String?   @db.VarChar(20)
+  CustCreatedBy  String?   @db.VarChar(150)
+  CustCreatedDt  DateTime? @db.DateTime
+  CustModifyBy   String?   @db.VarChar(100)
+  CustModifyDt   DateTime? @db.DateTime
+  CustDelID      Int?      @default(0, map: "DF__Tbl_Custo__CustD__060DEAE8")
+  CustAgent      String?   @db.VarChar(250)
+  IsAudit        Int?      @default(0, map: "DF__Tbl_Custo__IsAud__7849DB76")
+  CustFacebookID BigInt?
+  CustDeviceID   String?   @db.NVarChar(Max)
+  CustDeviceType String?   @db.VarChar(150)
+  App            String?   @db.VarChar(100)
+  AgentFk        BigInt?
+  CountryCode    String?   @db.VarChar(5)
+  DialCode       String?   @db.VarChar(10)
+  RefId          String?   @db.VarChar(150)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_Customer_Log {
+  CustPK         Int?
+  BookingContact String?   @db.VarChar(30)
+  DateTime       DateTime? @db.DateTime
+  User           String?   @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_DiscountFares {
+  DiscountPrice  Decimal?  @db.Decimal(27, 7)
+  DiscountOption String?   @db.Char(1)
+  DiscountDate   DateTime? @db.DateTime
+
+  @@ignore
+}
+
+model Tbl_DriverNotifications {
+  NotificationId   BigInt   @id @default(autoincrement())
+  NotificationText String
+  CreatedAt        DateTime @default(now())
+  DvrPk            BigInt
+
+  driver Tbl_DriverDetails @relation(fields: [DvrPk], references: [DvrPk])
+
+  @@index([DvrPk], name: "IX_dvr_notifications_DvrPk")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_DriverDetails {
+  DvrPk                    BigInt              @unique @default(autoincrement())
+  DvrTitle                 String?             @db.VarChar(10)
+  DvrFName                 String?             @db.VarChar(150)
+  DvrLName                 String?             @db.VarChar(50)
+  DvrDOB                   String?             @db.VarChar(10)
+  DvrAddr                  String?             @db.VarChar(250)
+  DvrContactNo             String?             @db.VarChar(15)
+  DvrEmailId               String?             @db.VarChar(150)
+  DvrNatInsNo              String?             @db.VarChar(150)
+  DvrLicNo                 String?             @db.VarChar(150)
+  DvrPcoNo                 String?             @db.VarChar(150)
+  DvrJobBeginDt            String?             @db.VarChar(10)
+  DvrJobEndDt              String?             @db.VarChar(10)
+  DvrCreatedBy             String?             @db.VarChar(50)
+  DvrCreatedDt             DateTime?           @db.DateTime
+  DvrModifiedBy            String?             @db.VarChar(50)
+  DvrModifiedDt            DateTime?           @db.DateTime
+  DvrDelId                 Int?                @default(0, map: "DF__Tbl_Drive__DvrDe__09DE7BCC")
+  DvrIsExpired             Int?                @default(0, map: "DF__Tbl_Drive__DvrIs__1209AD79")
+  DvrLicExpiryDt           String?             @db.VarChar(10)
+  DvrLicAttach             String?             @db.VarChar(650)
+  DvrLicAttachBack         String?             @db.VarChar(650)
+  DvrCounterPartAttach     String?             @db.VarChar(650)
+  DvrCounterPartAttachBack String?             @db.VarChar(650)
+  DvrRCAttach              String?             @db.VarChar(650)
+  DvrMOTNo                 String?             @db.VarChar(150)
+  DvrMOTExpiryDt           String?             @db.VarChar(10)
+  DvrMOTAttach             String?             @db.VarChar(650)
+  DvrPCOAttach             String?             @db.VarChar(650)
+  DvrVehInsNo              String?             @db.VarChar(150)
+  DvrVehInsExpiryDt        String?             @db.VarChar(10)
+  DvrVehInsAttach          String?             @db.VarChar(650)
+  DvrPcoLicExpiryDt        String?             @db.VarChar(10)
+  DvrPcoVehExpiryDt        String?             @db.VarChar(10)
+  DvrPcoDriverNo           String?             @db.VarChar(150)
+  IsAudit                  Int?                @default(0, map: "DF__Tbl_Drive__IsAud__6FB49575")
+  DvrVehColor              String?             @db.VarChar(100)
+  DvrVehRegNo              String?             @db.VarChar(100)
+  DvrVehModel              String?             @db.VarChar(100)
+  DvrBankDetail            String?             @db.VarChar(Max)
+  DvrProfilePic            String?             @db.VarChar(500)
+  DvrPwd                   String?             @db.VarChar(250)
+  DvrDeviceId              String?             @db.NVarChar(Max)
+  DvrDeviceType            String?             @db.VarChar(150)
+  DvrCarImage              String?             @db.VarChar(Max)
+  DvrLatLong               String?             @db.VarChar(200)
+  DvrRoadTaxExpiryDt       String?             @db.VarChar(100)
+  DvrType                  String?             @db.VarChar(10)
+  VehicleIds               String?             @db.VarChar(Max)
+  PaidBy                   String?             @db.VarChar(250)
+  IsTrack                  Int?
+  DvrCommission            Int?
+  IsCoachOperator          Boolean?
+  DvrParentId              BigInt?
+  OSPlayerID               String?             @db.VarChar(250)
+  IsDvrLicApproval         Boolean?
+  IsPco_Approval           Boolean?
+  IsDvrLicApproval_Back    Boolean?
+  IsPco_Approval_Back      Boolean?
+  dvr_notifications        Tbl_DriverNotifications[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_DriverHolidays {
+  Id          BigInt    @default(autoincrement())
+  DvrId       BigInt
+  StartDate   DateTime? @db.DateTime
+  EndDate     DateTime? @db.DateTime
+  Reason      String?   @db.VarChar(Max)
+  CreatedBy   String?   @db.VarChar(250)
+  CreatedDt   DateTime? @db.DateTime
+  ModifiedBy  String?   @db.VarChar(250)
+  ModifiedDt  DateTime? @db.DateTime
+  IsDeleted   Boolean?
+  LeaveStatus Int?
+
+  @@ignore
+}
+
+model Tbl_DriverRoute {
+  Id           Int       @id(map: "PK__Tbl_Driv__3214EC07313C2A1B") @default(autoincrement())
+  BookPk       BigInt
+  BookRefNo    String    @db.VarChar(150)
+  DvrPk        BigInt
+  DvrRoute     String?   @db.VarChar(Max)
+  JobStatusId  BigInt?
+  Status_0     DateTime? @db.DateTime
+  Status_1     DateTime? @db.DateTime
+  Status_2     DateTime? @db.DateTime
+  Status_3     DateTime? @db.DateTime
+  Status_4     DateTime? @db.DateTime
+  Status_5     DateTime? @db.DateTime
+  CreatedBy    String?   @db.VarChar(250)
+  CreatedDt    DateTime? @db.DateTime
+  ModifidedBy  String?   @db.VarChar(250)
+  ModifiedDt   DateTime? @db.DateTime
+  IsDeleted    Int?
+  GEO_Status_0 String?   @default("", map: "DF__Tbl_Drive__GEO_S__611C5D5B") @db.VarChar(100)
+  GEO_Status_1 String?   @default("", map: "DF__Tbl_Drive__GEO_S__62108194") @db.VarChar(100)
+  GEO_Status_2 String?   @default("", map: "DF__Tbl_Drive__GEO_S__6304A5CD") @db.VarChar(100)
+  GEO_Status_3 String?   @default("", map: "DF__Tbl_Drive__GEO_S__63F8CA06") @db.VarChar(100)
+  GEO_Status_4 String?   @default("", map: "DF__Tbl_Drive__GEO_S__64ECEE3F") @db.VarChar(100)
+  GEO_Status_5 String?   @default("", map: "DF__Tbl_Drive__GEO_S__65E11278") @db.VarChar(100)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tbl_dvr_veh_map {
+  dvrpk BigInt
+  vehpk BigInt
+
+  @@ignore
+}
+
+model Tbl_Enquiry {
+  ID          BigInt    @id(map: "PK__Tbl_Enqu__3214EC278FD8F1BB") @default(autoincrement())
+  AgentFk     BigInt?
+  Name        String    @db.VarChar(250)
+  Email       String?   @db.VarChar(250)
+  ContactNo   String?   @db.VarChar(50)
+  Subject     String?   @db.VarChar(Max)
+  Message     String?   @db.VarChar(Max)
+  EnquiryType String?   @db.VarChar(50)
+  PickupLoc   String?   @db.VarChar(Max)
+  PickupDt    String?   @db.VarChar(50)
+  DropLoc     String?   @db.VarChar(Max)
+  VehicleType String?   @db.VarChar(250)
+  NoOfPax     Int?
+  Status      String?   @db.VarChar(150)
+  Remarks     String?   @db.VarChar(Max)
+  Responder   String?   @db.VarChar(250)
+  CreatedDt   DateTime? @db.DateTime
+  ModifiedDt  DateTime? @db.DateTime
+  IsDeleted   Boolean?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_Expenses {
+  ExpPk        BigInt    @default(autoincrement())
+  ExpName      String?   @db.VarChar(250)
+  ExpDt        DateTime? @db.DateTime
+  ExpDesc      String?   @db.NVarChar(Max)
+  ExpAmt       Decimal?  @db.Decimal(27, 7)
+  ExpCurrentDt DateTime? @db.DateTime
+  ExpDelId     Int?      @default(0, map: "DF__Tbl_Expen__ExpDe__662B2B3B")
+  DvrAgentType String?   @db.VarChar(50)
+  DvrAgentId   BigInt?
+  IsMonthly    Boolean?
+  IsMigrated   Boolean   @default(false, map: "DF__Tbl_Expen__IsMig__1DD065E0")
+  PaidBy       String?   @db.VarChar(250)
+  ExpNo        String?   @db.VarChar(250)
+  ExpAttach    String?   @db.VarChar(Max)
+  PayMethod    String?   @db.VarChar(250)
+  CreatedBy    String?   @db.VarChar(250)
+  CreatedDt    DateTime? @db.DateTime
+  ModifiedBy   String?   @db.VarChar(250)
+  ModifiedDt   DateTime? @db.DateTime
+  ExpType      String?   @db.VarChar(250)
+
+  @@ignore
+}
+
+model tbl_InvoiceDetails {
+  ID          Int       @id(map: "PK_tbl_InvoiceDetails") @default(autoincrement())
+  HeaderId    Int
+  LineDate    DateTime? @db.DateTime
+  Description String?   @db.VarChar(30)
+  Amount      Decimal?  @db.Decimal(18, 2)
+}
+
+model tbl_InvoiceHeader {
+  ID            Int       @id(map: "PK_tbl_InvoiceHeader") @default(autoincrement())
+  InvoiceNo     String?   @db.VarChar(30)
+  InvDate       DateTime  @db.DateTime
+  BillToAddress String    @db.VarChar(300)
+  Total         Decimal   @db.Decimal(18, 2)
+  ReportType    String    @db.VarChar(10)
+  FileName      String    @db.VarChar(100)
+  CrBy          Int?
+  CrDate        DateTime? @db.DateTime
+  MdBy          Int?
+  MdDate        DateTime? @db.DateTime
+  Days          Boolean?  @default(false, map: "DF_tbl_InvoiceHeader_14Days") @map("14Days")
+}
+
+model Tbl_Invoices {
+  InvPk         BigInt    @id(map: "PK__Tbl_Invo__9DC87BB849992EFC") @default(autoincrement())
+  InvNo         String?   @db.VarChar(250)
+  InvDate       DateTime? @db.DateTime
+  InvType       String?   @db.VarChar(150)
+  InvAgentDvrPk BigInt?
+  InvPayMethod  String?   @db.VarChar(10)
+  InvAttach     String?   @db.VarChar(Max)
+  InvAmount     Decimal?  @default(0, map: "DF__Tbl_Invoi__InvAm__185783AC") @db.Decimal(27, 7)
+  InvDueAmt     Decimal?  @default(0, map: "DF__Tbl_Invoi__InvDu__194BA7E5") @db.Decimal(27, 7)
+  InvTotal      Decimal?  @default(0, map: "DF__Tbl_Invoi__InvTo__1A3FCC1E") @db.Decimal(27, 7)
+  InvPayStatus  String?   @db.VarChar(50)
+  Comments      String?   @db.VarChar(Max)
+  AccFk         BigInt?
+  IsPublished   Int?      @default(0, map: "DF__Tbl_Invoi__IsPub__1B33F057")
+  CreatedBy     String?   @db.VarChar(250)
+  CreatedDt     DateTime? @db.DateTime
+  ModifiedBy    String?   @db.VarChar(250)
+  ModifiedDt    DateTime? @db.DateTime
+  IsDeleted     Boolean?  @default(false, map: "DF__Tbl_Invoi__IsDel__1C281490")
+  InvMonthYear  String?   @db.VarChar(50)
+  PaymentDate   DateTime? @db.DateTime
+  CustomAddress String?   @db.VarChar(650)
+  AgentCode     String?   @db.VarChar(250)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_JobAgents {
+  AgentName        String?   @db.VarChar(150)
+  AgentValue       String?   @db.VarChar(50)
+  AgentDelId       Int?      @default(0, map: "DF__Tbl_JobAg__Agent__6477ECF3")
+  AgentAddr        String?   @db.VarChar(250)
+  AgentCity        String?   @db.VarChar(150)
+  AgentPhone       String?   @db.VarChar(50)
+  AgentPostCode    String?   @db.VarChar(50)
+  AgentEmail       String?   @db.VarChar(200)
+  AgentPk          BigInt    @default(autoincrement())
+  AgentCommission  Decimal?  @db.Decimal(27, 0)
+  IsAudit          Int?      @default(0, map: "DF__Tbl_JobAg__IsAud__76619304")
+  AgentCashComm    Decimal?  @db.Decimal(27, 7)
+  IsEditable       Boolean?
+  IsEmail          Boolean?
+  IsSMS            Boolean?
+  AgentDisplayName String?   @db.VarChar(Max)
+  AgentReportType  String?   @default("SPOTON", map: "DF__Tbl_JobAg__Agent__0CC5D56F") @db.VarChar(50)
+  CustomerComments String?   @db.VarChar(Max)
+  CreatedBy        String?   @db.VarChar(250)
+  CreatedDt        DateTime? @db.DateTime
+  ModifiedBy       String?   @db.VarChar(250)
+  ModifiedDt       DateTime? @db.DateTime
+  PayRecvBy        String?   @db.VarChar(250)
+  CreditNote       Decimal?  @default(0, map: "DF__Tbl_JobAg__Credi__2858E14B") @db.Decimal(27, 7)
+  ReportFk         BigInt?
+  Logo             String?   @db.VarChar(650)
+  IsRptTypeLogo    Boolean?  @default(false, map: "DF__Tbl_JobAg__IsRpt__7271D1E6")
+  IspaymentLink    Boolean?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_JobStatus {
+  StatusId   Int
+  StatusName String @db.VarChar(500)
+  SortOrder  Int?
+  IsDeleted  Int?   @default(0, map: "DF__Tbl_JobSt__IsDel__30E33A54")
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_LinkCategory {
+  CatPk    BigInt  @default(autoincrement())
+  CatDesc  String? @db.VarChar(250)
+  CatOrder Int?
+  CatDelId Int?    @default(0, map: "DF__Tbl_LinkC__CatDe__7A3223E8")
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_Links {
+  LnkTitle      String?   @db.VarChar(250)
+  LnkUrl        String?   @db.VarChar(500)
+  LnkDesc       String?   @db.VarChar(650)
+  LnkName       String?   @db.VarChar(200)
+  LnkEmail      String?   @db.VarChar(200)
+  LnkCatFk      BigInt?
+  LnkUniqueNo   String?   @db.VarChar(100)
+  IsLnkApproved Int?      @default(0, map: "DF__Tbl_Links__IsLnk__7E02B4CC")
+  LnkCreatedBy  String?   @db.VarChar(150)
+  LnkCreatedDt  DateTime? @db.DateTime
+  LnkModifiedBy String?   @db.VarChar(150)
+  LnkModifiedDt DateTime? @db.DateTime
+  LnkDelId      Int?      @default(0, map: "DF__Tbl_Links__LnkDe__7EF6D905")
+  LnkPk         BigInt    @default(autoincrement())
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_MailSettings {
+  FromName          String?  @db.VarChar(150)
+  FromMail          String?  @db.VarChar(250)
+  ToMail            String?  @db.VarChar(250)
+  CcMail            String?  @db.VarChar(250)
+  BccMail           String?  @db.VarChar(250)
+  SmtpServer        String?  @db.VarChar(100)
+  SmtpUser          String?  @db.VarChar(100)
+  SmtpPwd           String?  @db.VarChar(100)
+  SmtpPort          Int?     @default(25, map: "DF__Tbl_MailS__SmtpP__023D5A04")
+  FromName_Spoton   String?  @db.VarChar(150)
+  FromMail_Spoton   String?  @db.VarChar(150)
+  SmtpServer_Spoton String?  @db.VarChar(150)
+  SmtpUser_Spoton   String?  @db.VarChar(150)
+  SmtpPwd_Spoton    String?  @db.VarChar(150)
+  SmtpPort_Spoton   Int?
+  FromName_RJC      String?  @db.VarChar(150)
+  FromMail_RJC      String?  @db.VarChar(150)
+  SmtpServer_RJC    String?  @db.VarChar(150)
+  SmtpUser_RJC      String?  @db.VarChar(150)
+  SmtpPwd_RJC       String?  @db.VarChar(150)
+  SmtpPort_RJC      Int?
+  SSL_Apcon         Boolean?
+  SSL_Spoton        Boolean?
+  SSL_RJC           Boolean?
+  FromName_FTL      String?  @db.VarChar(150)
+  FromMail_FTL      String?  @db.VarChar(150)
+  SmtpServer_FTL    String?  @db.VarChar(150)
+  SmtpUser_FTL      String?  @db.VarChar(150)
+  SmtpPwd_FTL       String?  @db.VarChar(150)
+  SmtpPort_FTL      Int?
+  SSL_FTL           Boolean?
+  FromName_R        String?  @db.VarChar(150)
+  FromMail_R        String?  @db.VarChar(150)
+  SmtpServer_R      String?  @db.VarChar(150)
+  SmtpUser_R        String?  @db.VarChar(150)
+  SmtpPwd_R         String?  @db.VarChar(150)
+  SmtpPort_R        Int?
+  SSL_R             Boolean?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_MetaTags {
+  meta_id       Int     @default(autoincrement())
+  meta_desc     String? @db.VarChar(Max)
+  meta_keywords String? @db.VarChar(Max)
+  page_name     String? @db.VarChar(250)
+  meta_title    String? @db.VarChar(Max)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_MonthlyExpenses {
+  MonthlyExpPk BigInt    @default(autoincrement())
+  ExpPk        BigInt
+  ExpName      String?   @db.VarChar(250)
+  ExpDt        DateTime? @db.DateTime
+  ExpDesc      String?   @db.NVarChar(Max)
+  ExpAmt       Decimal?  @db.Decimal(27, 7)
+  ExpCurrentDt DateTime? @db.DateTime
+  ExpDelId     Int?
+  DvrAgentType String?   @db.VarChar(50)
+  DvrAgentId   BigInt?
+  IsDeleted    Boolean?
+
+  @@ignore
+}
+
+model Tbl_OfferLinks {
+  LnkPk         BigInt    @id(map: "PK__Tbl_Offe__CF35BAB110F1E78E") @default(autoincrement())
+  PromoFk       BigInt
+  LocPickupFk   BigInt
+  LocDropFk     BigInt
+  LnkTitle      String?   @db.VarChar(Max)
+  LnkDesc       String?   @db.VarChar(Max)
+  LnkUrl        String?   @db.VarChar(Max)
+  LinkImg       String?   @db.VarChar(Max)
+  LnkCreatedBy  String?   @db.VarChar(150)
+  LnkCreatedDt  DateTime? @db.DateTime
+  LnkModifiedBy String?   @db.VarChar(150)
+  LnkModifiedDt DateTime? @db.DateTime
+  LnkDelId      Int?
+  Direction     String?   @db.VarChar(Max)
+  ETA           String?   @db.VarChar(50)
+  Distance      Decimal?  @db.Decimal(27, 7)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_OperationArea {
+  AreaPk        BigInt    @default(autoincrement())
+  AreaName      String?   @db.VarChar(150)
+  AreaCreatedBy String?   @db.VarChar(150)
+  AreaCreatedDt DateTime? @db.DateTime
+  AreaModifyBy  String?   @db.VarChar(100)
+  AreaModifyDt  DateTime? @db.DateTime
+  AreaDelID     Int?      @default(0, map: "DF__Tbl_Opera__AreaD__0E391C95")
+  LocType       String?   @db.VarChar(100)
+  LocPk         BigInt?
+  AreaType      String?   @db.VarChar(10)
+  IsCongest     Boolean?  @default(false, map: "DF__Tbl_Opera__IsCon__02A839AF")
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_PhonePayment {
+  PhPayCustFk    BigInt?
+  PhPayPk        BigInt    @default(autoincrement())
+  PhPayCustRefNo String?   @db.VarChar(50)
+  PhPayTitle     String?   @db.VarChar(10)
+  PhPayFName     String?   @db.VarChar(100)
+  PhPayLName     String?   @db.VarChar(100)
+  PhPayEmail     String?   @db.VarChar(150)
+  PhPayAddr      String?   @db.VarChar(250)
+  PhPayPostCode  String?   @db.VarChar(100)
+  PhPayMobileNo  String?   @db.VarChar(20)
+  PhPayPhoneNo   String?   @db.VarChar(20)
+  PhPayAmount    Decimal?  @db.Decimal(27, 7)
+  PhPayCreatedBy String?   @db.VarChar(150)
+  PhPayCreatedDt DateTime? @db.DateTime
+  PhPayModifyBy  String?   @db.VarChar(100)
+  PhPayModifyDt  DateTime? @db.DateTime
+  PhPayDelID     Int?      @default(0, map: "DF__Tbl_Phone__PhPay__0425A276")
+  IsAudit        Int?      @default(0, map: "DF__Tbl_Phone__IsAud__7755B73D")
+
+  @@ignore
+}
+
+model Tbl_PriceRange {
+  ID         BigInt    @id(map: "PK__Tbl_Pric__3214EC27941A4A3B") @default(autoincrement())
+  FrmDt      DateTime  @db.DateTime
+  ToDt       DateTime  @db.DateTime
+  Percent    Decimal   @db.Decimal(27, 7)
+  CreatedBy  String?   @db.VarChar(250)
+  CreatedDt  DateTime? @db.DateTime
+  ModifiedBy String?   @db.VarChar(250)
+  ModifiedDt DateTime? @db.DateTime
+  IsDeleted  Int?      @default(0, map: "DF__Tbl_Price__IsDel__08E035F2")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_PricingPolicy {
+  PrcPk           BigInt    @default(autoincrement())
+  PrcStartMile    Decimal?  @db.Decimal(27, 7)
+  PrcEndMile      Decimal?  @db.Decimal(27, 7)
+  PrcUnit         Decimal?  @db.Decimal(27, 7)
+  PrcDefaultPrice Decimal?  @db.Decimal(27, 7)
+  PrcCreatedBy    String?   @db.VarChar(50)
+  PrcCreatedDt    DateTime? @db.DateTime
+  PrcModifiedBy   String?   @db.VarChar(50)
+  PrcModifiedDt   DateTime? @db.DateTime
+  PrcDelId        Int?      @default(0, map: "DF__Tbl_Prici__PrcDe__09746778")
+  CarId           BigInt?
+
+  @@ignore
+}
+
+model tbl_promotion_dtl {
+  dtlid        BigInt   @id(map: "PK__tbl_prom__BE8C8D137C80F70E") @default(autoincrement())
+  hdrid        BigInt
+  carid        BigInt
+  promofare    Decimal? @db.Decimal(27, 7)
+  promominfare Decimal? @db.Decimal(27, 7)
+}
+
+model tbl_promotion_dtl_2023_09_07 {
+  dtlid        BigInt   @id(map: "PK__tbl_prom__BE8C8D13F26C5FD5") @default(autoincrement())
+  hdrid        BigInt
+  carid        BigInt
+  promofare    Decimal? @db.Decimal(27, 7)
+  promominfare Decimal? @db.Decimal(27, 7)
+
+  @@map("tbl_promotion_dtl_2023-09-07")
+}
+
+model tbl_promotion_dtl_OLD {
+  dtlid        BigInt   @id(map: "PK__tbl_prom__BE8C8D13ED04CC87") @default(autoincrement())
+  hdrid        BigInt
+  carid        BigInt
+  promofare    Decimal? @db.Decimal(27, 7)
+  promominfare Decimal? @db.Decimal(27, 7)
+}
+
+model tbl_promotion_hdr {
+  hdrid          BigInt    @id(map: "PK__tbl_prom__D8CC3451F7A641A5") @default(autoincrement())
+  pickuppostcode String?   @db.VarChar(Max)
+  droppostcode   String?   @db.VarChar(Max)
+  airportpickup  Decimal?  @db.Decimal(27, 7)
+  parking        Decimal?  @db.Decimal(27, 7)
+  createdby      String?   @db.VarChar(250)
+  createddt      DateTime? @db.DateTime
+  modifiedby     String?   @db.VarChar(250)
+  modifieddt     DateTime? @db.DateTime
+  isdeleted      Int?
+  promotitle     String?   @db.VarChar(250)
+  promodesc      String?   @db.VarChar(Max)
+  promoterms     String?   @db.VarChar(Max)
+  promoimg       String?   @db.VarChar(250)
+}
+
+model tbl_promotion_hdr_2023_09_07 {
+  hdrid          BigInt    @id(map: "PK__tbl_prom__D8CC345197D69E9A") @default(autoincrement())
+  pickuppostcode String?   @db.VarChar(Max)
+  droppostcode   String?   @db.VarChar(Max)
+  airportpickup  Decimal?  @db.Decimal(27, 7)
+  parking        Decimal?  @db.Decimal(27, 7)
+  createdby      String?   @db.VarChar(250)
+  createddt      DateTime? @db.DateTime
+  modifiedby     String?   @db.VarChar(250)
+  modifieddt     DateTime? @db.DateTime
+  isdeleted      Int?
+  promotitle     String?   @db.VarChar(250)
+  promodesc      String?   @db.VarChar(Max)
+  promoterms     String?   @db.VarChar(Max)
+  promoimg       String?   @db.VarChar(250)
+
+  @@map("tbl_promotion_hdr_2023-09-07")
+}
+
+model tbl_promotion_hdr_OLD {
+  hdrid          BigInt    @id(map: "PK__tbl_prom__D8CC3451A38E80E0") @default(autoincrement())
+  pickuppostcode String?   @db.VarChar(Max)
+  droppostcode   String?   @db.VarChar(Max)
+  airportpickup  Decimal?  @db.Decimal(27, 7)
+  parking        Decimal?  @db.Decimal(27, 7)
+  createdby      String?   @db.VarChar(250)
+  createddt      DateTime? @db.DateTime
+  modifiedby     String?   @db.VarChar(250)
+  modifieddt     DateTime? @db.DateTime
+  isdeleted      Int?
+  promotitle     String?   @db.VarChar(250)
+  promodesc      String?   @db.VarChar(Max)
+  promoterms     String?   @db.VarChar(Max)
+  promoimg       String?   @db.VarChar(250)
+}
+
+model Tbl_ReportType {
+  RptPk             BigInt   @id(map: "PK__Tbl_Repo__A5032A04F3FC24B0") @default(autoincrement())
+  BankFk            BigInt?
+  RptCode           String   @db.VarChar(100)
+  RptLogo           String?  @db.VarChar(650)
+  RptFromAddr       String?  @db.VarChar(650)
+  RptToAddr         String?  @db.VarChar(650)
+  RptFooterMsg      String?  @db.VarChar(Max)
+  RptCreatorNm      String?  @db.VarChar(250)
+  RptCreatorMail    String?  @db.VarChar(250)
+  RptCreatorContact String?  @db.VarChar(150)
+  IsDeleted         Boolean? @default(false, map: "DF__Tbl_Repor__IsDel__53633AE1")
+  SmtpFk            BigInt?
+}
+
+model Tbl_SMTP {
+  SmtpPk     BigInt   @id(map: "PK__Tbl_SMTP__F707E228B89196AA")
+  FromName   String   @db.VarChar(250)
+  FromMail   String   @db.VarChar(250)
+  ToMail     String   @db.VarChar(650)
+  CcMail     String?  @db.VarChar(250)
+  BccMail    String?  @db.VarChar(250)
+  SmtpServer String?  @db.VarChar(150)
+  SmtpUser   String?  @db.VarChar(150)
+  SmtpPwd    String?  @db.VarChar(250)
+  SmtpPort   Int?
+  IsSSL      Boolean?
+}
+
+model Tbl_SquarePayment {
+  SquareId           Int     @id(map: "PK_Tbl_SquarePayment") @default(autoincrement())
+  SquareUser         String? @db.VarChar(50)
+  Square_AccessToken String? @db.NVarChar(500)
+  Square_Loc         String? @db.NVarChar(50)
+  Square_Url         String? @db.NVarChar(500)
+  Square_Version     String? @db.NVarChar(50)
+  currency           String? @db.NVarChar(50)
+  Square_Account     String? @db.VarChar(50)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tbl_UrlRewrite {
+  urlid              Int     @default(autoincrement())
+  url_desc           String? @db.VarChar(100)
+  actual_url         String? @db.VarChar(100)
+  current_psuedo_url String? @db.VarChar(100)
+
+  @@ignore
+}
+
+model Tbl_User {
+  UserPk      BigInt    @id(map: "PK__Tbl_User__1788851E872BDF8B") @default(autoincrement())
+  AgentFk     BigInt
+  FirstName   String    @db.VarChar(250)
+  LastName    String?   @db.VarChar(250)
+  Gender      String?   @db.VarChar(150)
+  UserName    String    @db.VarChar(250)
+  Pwd         String    @db.VarChar(650)
+  Email       String?   @db.VarChar(650)
+  ContactNo   String    @db.VarChar(15)
+  Designation String?   @db.VarChar(250)
+  IsAdmin     Boolean?
+  IsView      Boolean?
+  IsEdit      Boolean?
+  IsDelete    Boolean?
+  DeviceType  String?   @db.VarChar(100)
+  DeviceId    String?   @db.VarChar(650)
+  App         String?   @db.VarChar(100)
+  CreatedBy   String?   @db.VarChar(250)
+  CreatedDt   DateTime? @db.DateTime
+  ModifyBy    String?   @db.VarChar(250)
+  ModifyDt    DateTime? @db.DateTime
+  IsDeleted   Boolean?
+  IsAudit     Int?
+}
+
+model Tbl_VehicleDetails {
+  VehicleId             BigInt    @id(map: "PK__Tbl_Vehi__476B54922DEA3F7D") @default(autoincrement())
+  VehicleRegNo          String?   @db.VarChar(250)
+  VehicleColor          String?   @db.VarChar(50)
+  VehicleModel          String?   @db.VarChar(250)
+  VehicleImage          String?   @db.VarChar(Max)
+  VehicleRegAttach      String?   @db.VarChar(Max)
+  MOTNo                 String?   @db.VarChar(250)
+  MOTExpiryDt           String?   @db.VarChar(20)
+  MOTAttach             String?   @db.VarChar(Max)
+  PCOVehNo              String?   @db.VarChar(250)
+  PCOVehExpiryDt        String?   @db.VarChar(20)
+  PCOVehAttach          String?   @db.VarChar(Max)
+  VehicleInsNo          String?   @db.VarChar(250)
+  VehicleInsExpiryDt    String?   @db.VarChar(20)
+  VehicleInsAttach      String?   @db.VarChar(Max)
+  VehicleInsAttach_Back String?   @db.VarChar(Max)
+  RoadTaxExpiryDt       String?   @db.VarChar(20)
+  CreatedBy             String?   @db.VarChar(250)
+  CreatedDt             DateTime? @db.DateTime
+  ModifiedBy            String?   @db.VarChar(250)
+  ModifiedDt            DateTime? @db.DateTime
+  IsDeleted             Boolean?  @default(false, map: "DF__Tbl_Vehic__IsDel__1F398B65")
+  IsVehExpired          Boolean?  @default(false, map: "DF__Tbl_Vehic__IsVeh__202DAF9E")
+  IsCompanyVeh          Boolean?
+  MOTTestDt             String?   @db.VarChar(20)
+  RoadTaxAttach         String?   @db.VarChar(Max)
+  VehicleAddlImage      String?   @db.VarChar(Max)
+  V5                    String?   @db.VarChar(Max)
+  V5_Back               String?   @db.VarChar(Max)
+  IsInsApproval         Boolean?
+  IsV5Approval          Boolean?
+  IsInsApprovalBack     Boolean?
+  IsV5ApprovalBack      Boolean?
+}
+
+model Tbl_VehicleExpense {
+  ExpPk      BigInt    @id(map: "PK__Tbl_Vehi__45B6C107D3C30446") @default(autoincrement())
+  ExpNo      String    @db.VarChar(250)
+  ExpDesc    String?   @db.VarChar(Max)
+  ExpDt      DateTime? @db.DateTime
+  ExpAttach  String?   @db.VarChar(Max)
+  ExpAmt     Decimal?  @db.Decimal(27, 7)
+  VehicleFk  BigInt?
+  PayMethod  String?   @db.VarChar(150)
+  PaidBy     String?   @db.VarChar(250)
+  CreatedBy  String?   @db.VarChar(150)
+  CreatedDt  DateTime? @db.DateTime
+  ModifiedBy String?   @db.VarChar(150)
+  ModifiedDt DateTime? @db.DateTime
+  IsDeleted  Int?
+  IsMonthly  Boolean?
+  IsMigrated Boolean?
+  ExpType    String?   @db.VarChar(250)
+  OfficeExp  String?   @db.VarChar(Max)
+}
+
+model Tbl_VehicleMaintenance {
+  Id          BigInt    @id(map: "PK__Tbl_Vehi__3214EC070F6C8047") @default(autoincrement())
+  VehicleId   BigInt
+  StartDate   DateTime? @db.DateTime
+  EndDate     DateTime? @db.DateTime
+  Description String?   @db.VarChar(Max)
+  CreatedBy   String?   @db.VarChar(250)
+  CreatedDt   DateTime? @db.DateTime
+  ModifiedBy  String?   @db.VarChar(250)
+  ModifiedDt  DateTime? @db.DateTime
+  IsDeleted   Boolean?
+}
+
+model UserModel {
+  Id                     BigInt    @id(map: "PK_UserModel") @default(autoincrement())
+  UserName               String?   @db.VarChar(50)
+  Password               String?   @db.VarChar(50)
+  RefreshToken           String?   @db.NVarChar(Max)
+  RefreshTokenExpiryTime DateTime? @db.DateTime
+  Role                   String?   @db.Char(1)
+  ISDriverOrCustomerID   BigInt?
+}
+
+model UserOTP {
+  Id         Int       @id(map: "PK_UserOTP") @default(autoincrement())
+  EmailId    String?   @db.NVarChar(50)
+  Role       String?   @db.Char(1)
+  OTP        BigInt?
+  CreationDt DateTime? @db.DateTime
+  ExpiryDt   DateTime? @db.DateTime
+  RoleBaseID BigInt?
+}
+
+model tbl_FileUpload {
+  Id        Int     @id(map: "PK_tbl_FileUpload") @default(autoincrement())
+  BookRefNo String? @db.VarChar(50)
+  FileUplad String? @db.VarChar(Max)
+  Remarks   String? @db.VarChar(500)
+}
+
+model test {
+  id    Int    @unique
+  InvNo String @db.VarChar(250)
+}
