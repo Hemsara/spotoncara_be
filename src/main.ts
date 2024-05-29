@@ -16,12 +16,13 @@ async function bootstrap() {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
+        description: 'Input your JWT token',
+        name: 'Authorization',
         in: 'header',
       },
-      'JWT-auth',
+      'jwt',
     )
+
     .build();
 
   const theme = new SwaggerTheme();

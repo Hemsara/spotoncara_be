@@ -12,8 +12,6 @@ export class NotifyService {
     private readonly prisma: PrismaService,
   ) {}
 
-
-
   async notifyPending(dto: NotifyPendingDTO) {
     try {
       const today = new Date();
@@ -22,20 +20,16 @@ export class NotifyService {
 
       const pendingCount = await this.prisma.tbl_BookingDetails.count({
         where: {
-          JobStatus: {
-            in: [0],
-          },
+          JobStatus: 0,
+          IsPublish: true,
 
-          BookPickupDtTime: {
-            gte: startOfDay,
-            lte: endOfDay,
-          },
+          DriverPk: BigInt(dto.dvrPk),
         },
       });
 
-      // if (pendingCount == 0) {
-      //   return { message: 'No pending jobs' };
-      // }
+      if (pendingCount == 0) {
+        return { message: 'No pending jobs' };
+      }
 
       const contents = {
         en: `You’ve got ${pendingCount} pending jobs today. Please review and accept them promptly!`,

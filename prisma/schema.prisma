@@ -22,6 +22,12 @@ model AppSetting {
   @@ignore
 }
 
+model NotificationCodes {
+  Id    BigInt @unique @default(autoincrement())
+  Value String @db.VarChar(50)
+  Code  BigInt
+}
+
 model Location {
   LocPk                                   BigInt      @id(map: "PK__Location__6A46651BB8E69869") @default(autoincrement())
   LocName                                 String?     @db.VarChar(500)
@@ -382,7 +388,7 @@ model Tbl_Accounts_2019 {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Tbl_AccountsLogin {
-  AccUserPk    BigInt    @default(autoincrement())
+  AccUserPk    BigInt    @unique @default(autoincrement())
   AccUserName  String?   @db.VarChar(500)
   AccUserPwd   String?   @db.VarChar(500)
   AccPrevilege String?   @default("1101", map: "DF__Tbl_Accou__AccPr__5EBF139D") @db.Char(4)
@@ -398,8 +404,6 @@ model Tbl_AccountsLogin {
   App          String?   @db.VarChar(50)
   AgentFk      BigInt?
   APIToken     String?   @db.VarChar(Max)
-
-  @@ignore
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1127,61 +1131,61 @@ model Tbl_DriverNotifications {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Tbl_DriverDetails {
-  DvrPk                    BigInt              @unique @default(autoincrement())
-  DvrTitle                 String?             @db.VarChar(10)
-  DvrFName                 String?             @db.VarChar(150)
-  DvrLName                 String?             @db.VarChar(50)
-  DvrDOB                   String?             @db.VarChar(10)
-  DvrAddr                  String?             @db.VarChar(250)
-  DvrContactNo             String?             @db.VarChar(15)
-  DvrEmailId               String?             @db.VarChar(150)
-  DvrNatInsNo              String?             @db.VarChar(150)
-  DvrLicNo                 String?             @db.VarChar(150)
-  DvrPcoNo                 String?             @db.VarChar(150)
-  DvrJobBeginDt            String?             @db.VarChar(10)
-  DvrJobEndDt              String?             @db.VarChar(10)
-  DvrCreatedBy             String?             @db.VarChar(50)
-  DvrCreatedDt             DateTime?           @db.DateTime
-  DvrModifiedBy            String?             @db.VarChar(50)
-  DvrModifiedDt            DateTime?           @db.DateTime
-  DvrDelId                 Int?                @default(0, map: "DF__Tbl_Drive__DvrDe__09DE7BCC")
-  DvrIsExpired             Int?                @default(0, map: "DF__Tbl_Drive__DvrIs__1209AD79")
-  DvrLicExpiryDt           String?             @db.VarChar(10)
-  DvrLicAttach             String?             @db.VarChar(650)
-  DvrLicAttachBack         String?             @db.VarChar(650)
-  DvrCounterPartAttach     String?             @db.VarChar(650)
-  DvrCounterPartAttachBack String?             @db.VarChar(650)
-  DvrRCAttach              String?             @db.VarChar(650)
-  DvrMOTNo                 String?             @db.VarChar(150)
-  DvrMOTExpiryDt           String?             @db.VarChar(10)
-  DvrMOTAttach             String?             @db.VarChar(650)
-  DvrPCOAttach             String?             @db.VarChar(650)
-  DvrVehInsNo              String?             @db.VarChar(150)
-  DvrVehInsExpiryDt        String?             @db.VarChar(10)
-  DvrVehInsAttach          String?             @db.VarChar(650)
-  DvrPcoLicExpiryDt        String?             @db.VarChar(10)
-  DvrPcoVehExpiryDt        String?             @db.VarChar(10)
-  DvrPcoDriverNo           String?             @db.VarChar(150)
-  IsAudit                  Int?                @default(0, map: "DF__Tbl_Drive__IsAud__6FB49575")
-  DvrVehColor              String?             @db.VarChar(100)
-  DvrVehRegNo              String?             @db.VarChar(100)
-  DvrVehModel              String?             @db.VarChar(100)
-  DvrBankDetail            String?             @db.VarChar(Max)
-  DvrProfilePic            String?             @db.VarChar(500)
-  DvrPwd                   String?             @db.VarChar(250)
-  DvrDeviceId              String?             @db.NVarChar(Max)
-  DvrDeviceType            String?             @db.VarChar(150)
-  DvrCarImage              String?             @db.VarChar(Max)
-  DvrLatLong               String?             @db.VarChar(200)
-  DvrRoadTaxExpiryDt       String?             @db.VarChar(100)
-  DvrType                  String?             @db.VarChar(10)
-  VehicleIds               String?             @db.VarChar(Max)
-  PaidBy                   String?             @db.VarChar(250)
+  DvrPk                    BigInt                    @unique @default(autoincrement())
+  DvrTitle                 String?                   @db.VarChar(10)
+  DvrFName                 String?                   @db.VarChar(150)
+  DvrLName                 String?                   @db.VarChar(50)
+  DvrDOB                   String?                   @db.VarChar(10)
+  DvrAddr                  String?                   @db.VarChar(250)
+  DvrContactNo             String?                   @db.VarChar(15)
+  DvrEmailId               String?                   @db.VarChar(150)
+  DvrNatInsNo              String?                   @db.VarChar(150)
+  DvrLicNo                 String?                   @db.VarChar(150)
+  DvrPcoNo                 String?                   @db.VarChar(150)
+  DvrJobBeginDt            String?                   @db.VarChar(10)
+  DvrJobEndDt              String?                   @db.VarChar(10)
+  DvrCreatedBy             String?                   @db.VarChar(50)
+  DvrCreatedDt             DateTime?                 @db.DateTime
+  DvrModifiedBy            String?                   @db.VarChar(50)
+  DvrModifiedDt            DateTime?                 @db.DateTime
+  DvrDelId                 Int?                      @default(0, map: "DF__Tbl_Drive__DvrDe__09DE7BCC")
+  DvrIsExpired             Int?                      @default(0, map: "DF__Tbl_Drive__DvrIs__1209AD79")
+  DvrLicExpiryDt           String?                   @db.VarChar(10)
+  DvrLicAttach             String?                   @db.VarChar(650)
+  DvrLicAttachBack         String?                   @db.VarChar(650)
+  DvrCounterPartAttach     String?                   @db.VarChar(650)
+  DvrCounterPartAttachBack String?                   @db.VarChar(650)
+  DvrRCAttach              String?                   @db.VarChar(650)
+  DvrMOTNo                 String?                   @db.VarChar(150)
+  DvrMOTExpiryDt           String?                   @db.VarChar(10)
+  DvrMOTAttach             String?                   @db.VarChar(650)
+  DvrPCOAttach             String?                   @db.VarChar(650)
+  DvrVehInsNo              String?                   @db.VarChar(150)
+  DvrVehInsExpiryDt        String?                   @db.VarChar(10)
+  DvrVehInsAttach          String?                   @db.VarChar(650)
+  DvrPcoLicExpiryDt        String?                   @db.VarChar(10)
+  DvrPcoVehExpiryDt        String?                   @db.VarChar(10)
+  DvrPcoDriverNo           String?                   @db.VarChar(150)
+  IsAudit                  Int?                      @default(0, map: "DF__Tbl_Drive__IsAud__6FB49575")
+  DvrVehColor              String?                   @db.VarChar(100)
+  DvrVehRegNo              String?                   @db.VarChar(100)
+  DvrVehModel              String?                   @db.VarChar(100)
+  DvrBankDetail            String?                   @db.VarChar(Max)
+  DvrProfilePic            String?                   @db.VarChar(500)
+  DvrPwd                   String?                   @db.VarChar(250)
+  DvrDeviceId              String?                   @db.NVarChar(Max)
+  DvrDeviceType            String?                   @db.VarChar(150)
+  DvrCarImage              String?                   @db.VarChar(Max)
+  DvrLatLong               String?                   @db.VarChar(200)
+  DvrRoadTaxExpiryDt       String?                   @db.VarChar(100)
+  DvrType                  String?                   @db.VarChar(10)
+  VehicleIds               String?                   @db.VarChar(Max)
+  PaidBy                   String?                   @db.VarChar(250)
   IsTrack                  Int?
   DvrCommission            Int?
   IsCoachOperator          Boolean?
   DvrParentId              BigInt?
-  OSPlayerID               String?             @db.VarChar(250)
+  OSPlayerID               String?                   @db.VarChar(250)
   IsDvrLicApproval         Boolean?
   IsPco_Approval           Boolean?
   IsDvrLicApproval_Back    Boolean?

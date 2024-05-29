@@ -9,11 +9,14 @@ import { NotifyModule } from './notify/notify.module';
 import { OnesignalService } from './onesignal/onesignal.service';
 import { DriversModule } from './drivers/drivers.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { AuthModule } from './auth/auth.module';
+import { EncryptionService } from './encryption/encryption.service';
+
 
 @Module({
-  imports: [ConfigModule.forRoot(), NotifyModule, DriversModule, BookingsModule],
+  imports: [ConfigModule.forRoot(), NotifyModule, DriversModule, BookingsModule, AuthModule],
 
   controllers: [AppController],
-  providers: [AppService, PrismaService, OnesignalService],
+  providers: [AppService, PrismaService, OnesignalService, EncryptionService],
 })
 export class AppModule {}
