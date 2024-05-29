@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-
 import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma/prisma.service';
 import { NotifyModule } from './notify/notify.module';
@@ -11,10 +10,17 @@ import { DriversModule } from './drivers/drivers.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { AuthModule } from './auth/auth.module';
 import { EncryptionService } from './encryption/encryption.service';
-
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [ConfigModule.forRoot(), NotifyModule, DriversModule, BookingsModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot(),
+    NotifyModule,
+    DriversModule,
+    BookingsModule,
+    AuthModule,
+    ScheduleModule.forRoot(),
+  ],
 
   controllers: [AppController],
   providers: [AppService, PrismaService, OnesignalService, EncryptionService],

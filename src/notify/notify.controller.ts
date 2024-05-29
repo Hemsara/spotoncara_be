@@ -10,10 +10,11 @@ import {
 } from '@nestjs/common';
 import { NotifyService } from './notify.service';
 import { CreateNotifyDto } from './dto/create-notify.dto';
-import { UpdateNotifyDto } from './dto/update-notify.dto';
+
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { NotifyPendingDTO } from './dto/notify-pending.dto';
 import { SpotOnAuthGuard } from 'src/middleware/auth.guars';
+import { AlterNotifyDto } from './dto/alter-notify.dto';
 
 
 @ApiTags('Notifications')
@@ -30,5 +31,13 @@ export class NotifyController {
   @Post("/pending")
   notifyPending(@Body() dto: NotifyPendingDTO) {
     return this.notifyService.notifyPending(dto);
+  }
+  @Post("/alter")
+  notifyChanges(@Body() dto: AlterNotifyDto) {
+    return this.notifyService.alterNotify(dto);
+  }
+  @Post("/publish")
+  publishBookings(@Body() dto: AlterNotifyDto) {
+    return this.notifyService.alterNotify(dto);
   }
 }
